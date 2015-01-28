@@ -1,0 +1,82 @@
+{
+  "name": "volunteerily-web-core",
+  "version": "1.0.0",
+  "description": "Core code for DB, Server, etc",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "NODE_ENV=test mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Volunteerily/web-core.git"
+  },
+  "keywords": [
+    "boilerplate",
+    "node",
+    "mongodb"
+  ],
+  "author": "Dan Le Van",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Volunteerily/web-core/issues"
+  },
+  "homepage": "https://github.com/Volunteerily/web-core",
+  "dependencies": {
+    "bcrypt": "^0.8.0",
+    "body-parser": "^1.6.7",
+    "chalk": "^0.5.1",
+    "cookie-parser": "^1.3.3",
+    "express": "^4.8.7",
+    "express-dot-engine": "^1.0.3",
+    "i18n": "^0.5.0",
+    "kew": "^0.4.0",
+    "lodash": "^2.4.1",
+    "method-override": "^2.2.0",
+    "moment": "^2.9.0",
+    "mongoose": "^3.8.18",
+    "morgan": "^1.3.1",
+    "nodemailer": "^1.3.0",
+    "nodemailer-direct-transport": "^1.0.0",
+    "serve-favicon": "^2.1.1"
+  },
+  "optionalDependencies": {},
+  "devDependencies": {
+    "blanket": "^1.1.6",
+    "bower": "^1.3.10",
+    "chai": "^1.10.0",
+    "cookie-signature": "^1.0.5",
+    "font-awesome-stylus": "^1.2.0",
+    "google-material-color": "^1.2.0",
+    "gulp": "^3.8.10",
+    "gulp-bower": "0.0.7",
+    "gulp-clean": "^0.3.1",
+    "gulp-concat": "^2.4.2",
+    "gulp-config-sync": "0.0.1",
+    "gulp-duration": "0.0.0",
+    "gulp-header": "^1.2.2",
+    "gulp-install": "^0.2.0",
+    "gulp-jsdoc": "^0.1.4",
+    "gulp-nodemon": "^1.0.4",
+    "gulp-notify": "^2.0.1",
+    "gulp-rename": "^1.2.0",
+    "gulp-shell": "^0.2.11",
+    "gulp-spawn-mocha": "^0.5.1",
+    "gulp-stylus": "^1.3.4",
+    "gulp-uglify": "^1.0.2",
+    "gulp-util": "^3.0.1",
+    "istanbul": "^0.3.4",
+    "karma": "^0.12.23",
+    "karma-mocha": "^0.1.9",
+    "lodash": "^2.4.1",
+    "matchdep": "^0.3.0",
+    "mocha": "^2.0.1",
+    "nib": "^1.0.4",
+    "osm-pbf-parser": "^2.1.2",
+    "require-dir": "^0.1.0",
+    "rewire": "^2.1.0",
+    "through2": "^0.6.3"
+  }
+}
