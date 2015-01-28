@@ -43,7 +43,7 @@ Mailer.prototype = _.create(events.ObservableObject.prototype, {
     promise
       .create(template.render(
         path.join(
-          __dirname, '../../../', this.options.views,
+          this.options.views,
           templatePath + '.dot'
         ),
         {
