@@ -523,7 +523,14 @@ ViewModelBase.prototype = _.create(Object.prototype, {
     _.forEach(this.__fieldsLocalized, function(field) {
 
       var value = util.object.get(this, field.key);
-      var valueLocalized = _.has(value, lang) ? value[lang] : value.default;
+      var valueLocalized = value;
+
+      if(_.has(value, lang)) {
+        valueLocalized = value[lang];
+      }
+      else if(_.has(value, 'default')) {
+        valueLocalized = value.default;
+      }
 
       util.object.set(
         this,
