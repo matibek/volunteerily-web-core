@@ -412,23 +412,46 @@ ViewModelBase.prototype = _.create(Object.prototype, {
     }
 
     // validate each field
-    var result = _.reduce(
-      this.__info.create,
-      function(result, config, field) {
 
-        // skip if we're only validating the params
-        if (onlyParam && !_.has(this, field)) {
+    var result = _.chain(this.__info.create)
+
+      // only present field
+      .omit(function(def, field) {
+        return (onlyParam && !_.has(this, field));
+      }.bind(this))
+
+      // no validator
+      .omit(function(def, field) {
+        return !_.has(def, 'validators');
+      }.bind(this))
+
+      // spread localized
+      .reduce(function(result, def, field) {
+
+        if (this.__info.fields[field].type !== types.localized) {
+          result[field] = {
+            validators: def.validators,
+            value: this[field],
+          };
           return result;
         }
 
-        if (!_.has(config, 'validators')) {
-          return result;
-        }
+        _.forIn(this[field], function(value, key) {
+          result[field + '.' + key] = {
+            validators: def.validators,
+            value: value,
+          };
+        });
 
+        return result;
+      }.bind(this), {})
+
+      // validate
+      .reduce(function(result, def, field) {
         var results = validators.validate.call(
           this,
-          config.validators,
-          this[field]
+          def.validators,
+          def.value
         );
 
         if (_.keys(results).length > 0) {
@@ -436,9 +459,9 @@ ViewModelBase.prototype = _.create(Object.prototype, {
         }
 
         return result;
-      }.bind(this),
-      {}
-    );
+      }, {})
+
+      .valueOf();
 
     if (_.keys(result).length > 0) {
       //logger.debug(result);

@@ -17,8 +17,15 @@ describe('Core: model', function() {
 
   after(function(done) {
     testUtil.run([
-      'db-clean',
       'db-disconnect',
+    ],
+      done
+    );
+  });
+
+  beforeEach(function(done) {
+    testUtil.run([
+      'db-clean',
     ],
       done
     );
@@ -570,5 +577,156 @@ describe('Core: model', function() {
 
     });
 
+  });
+
+  //############################################################################
+  //############################################################################
+  describe('Validation', function() {
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should validate', function() {
+      // prepare
+      var info = {
+        name: 'Test1_57',
+
+        db: {
+          collection: 'tests',
+        },
+
+        fields: {
+          test: {
+            type: model.types.string,
+          },
+        },
+
+        create: {
+          test: {
+            validators: {
+              size: {
+                range: [5, 20],
+                message: 'should be between 5 and 20 characters',
+              },
+            },
+          },
+        },
+      };
+
+      var ViewModelClass = model
+        .constructModel(info)
+        .ViewModel;
+
+      // run
+      var result = new ViewModelClass({data: {
+        test: 'more than 5',
+      }});
+
+      result.validate();
+
+      // result
+      expect(result).to.have.property('test');
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should validate localized fields', function() {
+      // prepare
+      var info = {
+        name: 'Test1_56',
+
+        db: {
+          collection: 'tests',
+        },
+
+        fields: {
+          test: {
+            type: model.types.localized,
+          },
+        },
+
+        create: {
+          test: {
+            validators: {
+              size: {
+                range: [5, 20],
+                message: 'The alias should be between 5 and 20 characters',
+              },
+            },
+          },
+        },
+      };
+
+      var ViewModelClass = model
+        .constructModel(info)
+        .ViewModel;
+
+      // run
+      var result = new ViewModelClass({
+        data: {
+          test: {
+            default: 'more than 5',
+            en: 'more than 5',
+          },
+        },
+      });
+
+      result.validate();
+
+      // result
+      expect(result).to.have.property('test');
+
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should fail when one localized fields fails', function() {
+      // prepare
+      var info = {
+        name: 'Test1_59',
+
+        db: {
+          collection: 'tests',
+        },
+
+        fields: {
+          test: {
+            type: model.types.localized,
+          },
+        },
+
+        create: {
+          test: {
+            validators: {
+              size: {
+                range: [5, 20],
+                message: 'The alias should be between 5 and 20 characters',
+              },
+            },
+          },
+        },
+      };
+
+      var ViewModelClass = model
+        .constructModel(info)
+        .ViewModel;
+
+      // run
+      var result = new ViewModelClass({
+        data: {
+          test: {
+            default: 'more than 5',
+            en: '1',
+          },
+        },
+      });
+
+      (function() {
+        result.validate();
+      })
+
+      // result
+        .should
+        .throw(core.errors.ValidationError);
+    });
   });
 });
