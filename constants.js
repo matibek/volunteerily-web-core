@@ -2,6 +2,7 @@ var path = require('path');
 
 var constants = {
   ENVIRONMENTS: {
+    debug: 'debug',
     dev: 'dev',
     test: 'test',
     release: 'release',
