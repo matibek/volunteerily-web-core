@@ -500,8 +500,7 @@ describe('Core: model', function() {
 
             data: {
               localized: {
-                default: 'default',
-                en: 'english',
+                en: 'english', // default
                 ko: 'korean',
                 cn: 'chinese',
               },
@@ -516,7 +515,7 @@ describe('Core: model', function() {
 
       // result
         .then(function(result) {
-          expect(result).to.have.property('localized', 'default');
+          expect(result).to.have.property('localized', 'english');
         })
 
       // clean
@@ -664,8 +663,8 @@ describe('Core: model', function() {
       var result = new ViewModelClass({
         data: {
           test: {
-            default: 'more than 5',
             en: 'more than 5',
+            ko: 'more than 5',
           },
         },
       });
@@ -714,8 +713,8 @@ describe('Core: model', function() {
       var result = new ViewModelClass({
         data: {
           test: {
-            default: 'more than 5',
-            en: '1',
+            en: 'more than 5',
+            ko: '1',
           },
         },
       });

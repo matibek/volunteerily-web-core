@@ -43,7 +43,11 @@ var types = {
 
   localized: {
     default: null,
-    sample: { 'default': 'In Default lang', ko: 'In Korean', },
+    sample: {
+      en: '_(English text)',
+      ko: '_(Korean text)',
+      fr: '_(French text)',
+    },
     db: mongoose.Schema.Types.Mixed,
   },
 

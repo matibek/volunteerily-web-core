@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var config = require('../config');
 var db = require('../db');
 var EventEmitter = require('events').EventEmitter;
 var promise = require('../promise');
@@ -7,6 +8,10 @@ var schema = require('./schema');
 var types = require('./types');
 var util = require('../util');
 var validators = require('./validators');
+
+var defaultLang = config.i18n
+  ? (config.i18n.defaultLocale || 'en')
+  : 'en';
 
 /**
  * Initialize a prototype
@@ -389,7 +394,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
       }
 
       result[key] = sample.getSample(key, value);
-      
+
     });
   },
 
@@ -489,7 +494,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
     }
 
     // localized fields
-    var lang = 'default';
+    var lang = defaultLang;
     if (_.has(options, 'lang')) {
       lang = options.lang;
     }
@@ -522,8 +527,8 @@ ViewModelBase.prototype = _.create(Object.prototype, {
       if(_.has(value, lang)) {
         valueLocalized = value[lang];
       }
-      else if(_.has(value, 'default')) {
-        valueLocalized = value.default;
+      else if(_.has(value, defaultLang)) {
+        valueLocalized = value[defaultLang];
       }
 
       util.object.set(

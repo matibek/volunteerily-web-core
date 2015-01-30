@@ -6,7 +6,6 @@ var errorHandler = require('./middleware/errorHandler');
 var events = require('../events');
 var express = require('express');
 var favicon = require('serve-favicon');
-var i18n = require('i18n');
 var methodOverride = require('method-override');
 var middleware = require('./middleware');
 var morgan = require('morgan');
@@ -27,9 +26,7 @@ function Server(options) {
    * Options passed to the server
    * @member {Object}
    */
-  this.options = _.defaults(options, {
-    port: 80,
-  });
+  this.options = options;
 
   /**
    * The underlying server object (Express)
@@ -251,6 +248,7 @@ Server.prototype = {
 
     // localization
     if (this.options.i18n) {
+      var i18n = require('i18n');
       i18n.configure(this.options.i18n);
 
       // export localization method
