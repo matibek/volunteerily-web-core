@@ -35,37 +35,46 @@ function Mailer(options) {
 
 Mailer.prototype = _.create(events.ObservableObject.prototype, {
 
+  send: function(options) {
+
+    if (_.has(options, 'template')) {
+      return sendTemplate(options);
+    }
+
+    return sendHtml(options);
+
+  },
+
   /**
    * Builds the body with the template and send an email
    */
-  sendTemplate: function(to, subject, templatePath, model) {
+  sendTemplate: function(options) {
+
+    assert(options.template, 'Expected template path');
 
     promise
       .create(template.render(
         path.join(
           this.options.views,
-          templatePath + '.dot'
+          options.template + '.dot'
         ),
         {
-          config: config.public,
-          model: model,
+          config: config.public || {},
+          model: options.model || {},
         })
       )
       .then(function(body) {
-        this.send({
-          to: to,
-          subject: subject,
+        this.send(_.merge(options, {
           html: body,
-        });
+        }));
       }.bind(this))
       .end();
-
   },
 
   /**
    * Sends an email
    */
-  send: function(message) {
+  sendHtml: function(message) {
 
     assert(message, 'Expected message');
     assert(message.to, 'Email "to" address is required');
