@@ -728,4 +728,566 @@ describe('Core: model', function() {
         .throw(core.errors.ValidationError);
     });
   });
+
+  //############################################################################
+  //############################################################################
+  describe('DB', function() {
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should update', function(done) {
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'dbUpdate',
+
+            db: {
+              collection: 'tests',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              test: {
+                type: model.types.string,
+              },
+            },
+
+            data: {
+              test: 'test',
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.update(db.data._id, { test: 'test2', });
+        })
+
+      // result
+        .then(function(result) {
+          expect(result).to.have.property('test', 'test2');
+        })
+
+      // clean
+        .fin(done)
+        .done();
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should update on complex id', function(done) {
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'dbUpdate2',
+
+            db: {
+              collection: 'tests',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              id2: {
+                type: model.types.id,
+              },
+              test: {
+                type: model.types.string,
+              },
+            },
+
+            data: {
+              test: 'test',
+              id2: '5435e47000badbaddeadbeef',
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.update(
+            {
+              _id: db.data._id,
+              id2: db.data.id2,
+            },
+            { test: 'test2', }
+          );
+        })
+
+      // result
+        .then(function(result) {
+          expect(result).to.have.property('test', 'test2');
+        })
+
+      // clean
+        .fin(done)
+        .done();
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should not update on incomplete complex id', function(done) {
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'dbUpdate3',
+
+            db: {
+              collection: 'tests',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              id2: {
+                type: model.types.id,
+              },
+              test: {
+                type: model.types.string,
+              },
+            },
+
+            data: {
+              test: 'test',
+              id2: '5435e47000badbaddeadbeef',
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.update(
+            {
+              _id: db.data._id,
+              id2: '5435e47000badbaddeadbeee', // missmatch
+            },
+            { test: 'test2', }
+          );
+        })
+
+      // result
+        .then(function(result) {
+          expect(result).to.not.be.ok();
+        })
+
+      // clean
+        .fin(done)
+        .done();
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should update status', function(done) {
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'dbUpdateStatus',
+
+            db: {
+              collection: 'tests',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              status: {
+                type: model.types.mixed,
+              },
+            },
+
+            data: {
+              status: {
+                test: 'test',
+              },
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.updateStatus(
+            db.data._id,
+            'test2',
+            'test2'
+          );
+        })
+
+      // result
+        .then(function(result) {
+          expect(result).to.have.property('status');
+          expect(result.status).to.eql({ test: 'test', test2: 'test2', });
+        })
+
+      // clean
+        .fin(done)
+        .done();
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should push update', function(done) {
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'dbUpdatePush',
+
+            db: {
+              collection: 'tests',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              test: {
+                type: [model.types.mixed],
+              },
+            },
+
+            data: {
+              test: [{
+                test: 'test',
+              }],
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.updatePush(
+            db.data._id,
+            'test',
+            { test: 'test2', }
+          );
+        })
+
+      // result
+        .then(function(result) {
+          expect(result).to.have.property('test').with.length(2);
+          expect(result).to.have.property('_testCount', 2);
+        })
+
+      // clean
+        .fin(done)
+        .done();
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should push update on complex id', function(done) {
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'dbUpdatePush2',
+
+            db: {
+              collection: 'tests',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              id2: {
+                type: model.types.id,
+              },
+              test: {
+                type: [model.types.mixed],
+              },
+            },
+
+            data: {
+              id2: '5435e47000badbaddeadbeef',
+              test: [{
+                test: 'test',
+              }],
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.updatePush(
+            {
+              _id: db.data._id,
+              id2: db.data.id2,
+            },
+            'test',
+            { test: 'test2', }
+          );
+        })
+
+      // result
+        .then(function(result) {
+          expect(result).to.have.property('test').with.length(2);
+          expect(result).to.have.property('_testCount', 2);
+        })
+
+      // clean
+        .fin(done)
+        .done();
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should fail push update on incomplete complex id', function(done) {
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'dbUpdatePush3',
+
+            db: {
+              collection: 'tests',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              id2: {
+                type: model.types.id,
+              },
+              test: {
+                type: [model.types.mixed],
+              },
+            },
+
+            data: {
+              id2: '5435e47000badbaddeadbeef',
+              test: [{
+                test: 'test',
+              }],
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.updatePush(
+            {
+              _id: db.data._id,
+              id2: '5435e47000badbaddeadbeee',
+            },
+            'test',
+            { test: 'test2', }
+          );
+        })
+
+      // result
+        .then(function(result) {
+          expect(result).not.be.ok();
+        })
+
+      // clean
+        .fin(done)
+        .done();
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should pull update', function(done) {
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'dbUpdatePull',
+
+            db: {
+              collection: 'tests',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              test: {
+                type: [model.types.mixed],
+              },
+            },
+
+            data: {
+              test: [{
+                _id: '5435e47000badbaddeadbeef',
+                test: 'test',
+              }, {
+                _id: '5435e47000badbaddeadbeee',
+                test: 'test',
+              }],
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.updatePull(
+            db.data._id,
+            'test',
+            { _id: '5435e47000badbaddeadbeee', }
+          );
+        })
+
+      // result
+        .then(function(result) {
+          expect(result).to.have.property('test').with.length(1);
+          expect(result).to.have.property('_testCount', 1);
+        })
+
+      // clean
+        .fin(done)
+        .done();
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should pull update on complex id', function(done) {
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'dbUpdatePull2',
+
+            db: {
+              collection: 'tests',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              id2: {
+                type: model.types.id,
+              },
+              test: {
+                type: [model.types.mixed],
+              },
+            },
+
+            data: {
+              id2: '5435e47000badbaddeadbeea',
+              test: [{
+                _id: '5435e47000badbaddeadbeef',
+                test: 'test',
+              }, {
+                _id: '5435e47000badbaddeadbeee',
+                test: 'test',
+              }],
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.updatePull(
+            {
+              _id: db.data._id,
+              id2: '5435e47000badbaddeadbeea',
+            },
+            'test',
+            { _id: '5435e47000badbaddeadbeee', }
+          );
+        })
+
+      // result
+        .then(function(result) {
+          expect(result).to.have.property('test').with.length(1);
+          expect(result).to.have.property('_testCount', 1);
+        })
+
+      // clean
+        .fin(done)
+        .done();
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should fail pull update on incomplete complex id', function(done) {
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'dbUpdatePull3',
+
+            db: {
+              collection: 'tests',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              id2: {
+                type: model.types.id,
+              },
+              test: {
+                type: [model.types.mixed],
+              },
+            },
+
+            data: {
+              id2: '5435e47000badbaddeadbeea',
+              test: [{
+                _id: '5435e47000badbaddeadbeef',
+                test: 'test',
+              }, {
+                _id: '5435e47000badbaddeadbeee',
+                test: 'test',
+              }],
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.updatePull(
+            {
+              _id: db.data._id,
+              id2: '5435e47000badbaddeadbeeb',
+            },
+            'test',
+            { _id: '5435e47000badbaddeadbeee', }
+          );
+        })
+
+      // result
+        .then(function(result) {
+          expect(result).not.be.ok();
+        })
+
+      // clean
+        .fin(done)
+        .done();
+    });
+  });
 });

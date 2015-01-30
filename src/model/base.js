@@ -191,27 +191,37 @@ ViewModelBase.prototype = _.create(Object.prototype, {
 
   /**
    * Updates a ViewModel
-   * @param {ObjectId} id The string representation of an ObjectId
-   * @param {Object} fields The fields to update
    * @return {Promise} A promise to the result of the operation
    */
-  update: function() {
+  update: function(find) {
 
     assert(this.__info.db.write, this.__name + ' is not writable');
 
-    var id = this._id;
-    assert(id, 'Expected id to be present');
     var fields = _.omit(this._cleanObject(), '_id');
     assert(_.keys(fields).length > 0, 'Expected changes to the model');
+
+    if (!find) {
+      var id = this._id;
+      assert(id, 'Expected id to be present');
+      find = { _id: id, };
+    }
+
+    return this._update(find, fields);
+  },
+
+  /**
+   * Update private
+   */
+  _update: function(find, update) {
 
     // get the mongoose model def
     var DbModel = this.getDbModel();
 
     // call db
     return promise.nfcall(
-        DbModel.findByIdAndUpdate.bind(DbModel),
-        id,
-        fields
+        DbModel.findOneAndUpdate.bind(DbModel),
+        find,
+        update
       )
       .then(function(doc) {
 
@@ -224,16 +234,20 @@ ViewModelBase.prototype = _.create(Object.prototype, {
         var result = new this.__constructor({ data: doc, });
 
         // event
-        this.emit('update', result, fields);
+        this.emit('update', result, update);
 
         return result;
       }.bind(this));
+
   },
 
   /**
    * Updates a status
    */
   updateStatus: function updateStatus(id, status, value) {
+
+    assert(this.__info.db.write, this.__name + ' is not writable');
+
     assert(id, 'Expected an id');
     assert(status, 'Expected a status');
 

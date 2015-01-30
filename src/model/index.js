@@ -69,8 +69,16 @@ function constructModel(info) {
      */
     update: function(id, fields, options) {
 
+      assert(fields, 'Expected some changes');
+
+      // support multiple id
+      var find = null;
+      if (_.isPlainObject(id)) {
+        find = id;
+        id = id._id || '';
+      }
+
       // put the id in
-      fields = fields ? fields : {};
       fields._id = id;
 
       var result = new ViewModel({ data: fields, transform: true, });
@@ -79,7 +87,7 @@ function constructModel(info) {
         result.validate(true); // only validate fields that are present
       }
 
-      return result.update();
+      return result.update(find);
     },
 
     /**
@@ -106,9 +114,12 @@ function constructModel(info) {
       var inc = {};
       inc['_' + field + 'Count'] = 1;
 
-      var dbModel = this.getDbModel();
-      return promise.nfcall(dbModel.update.bind(dbModel),
-        { _id: id, },
+      // support multiple id
+      var find = _.isPlainObject(id) ? id : { _id: id, };
+
+      return ViewModel.prototype._update.call(
+        ViewModel.prototype,
+        find,
         {
           $push: push,
           $inc: inc,
@@ -130,9 +141,12 @@ function constructModel(info) {
       var inc = {};
       inc['_' + field + 'Count'] = -1;
 
-      var dbModel = this.getDbModel();
-      return promise.nfcall(dbModel.update.bind(dbModel),
-        { _id: id, },
+      // support multiple id
+      var find = _.isPlainObject(id) ? id : { _id: id, };
+
+      return ViewModel.prototype._update.call(
+        ViewModel.prototype,
+        find,
         {
           $pull: pull,
           $inc: inc,
