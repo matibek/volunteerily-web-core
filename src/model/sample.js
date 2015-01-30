@@ -155,20 +155,25 @@ function getGenericSample(name, type) {
   });
 }
 
-function getSample(name, type) {
+function getSample(name, value) {
+
   var sample = null;
+  var type = value.type;
 
   // specific sample
-  if (_.has(map, name)) {
+  if (_.has(value, 'sample') || _.isFunction(value.sample)) {
+    sample = value.sample;
+  }
+  else if (_.has(map, name)) {
     sample = map[name];
+  }
 
-    if (_.isFunction(sample)) {
-      sample = sample();
-    }
+  if (_.isFunction(sample)) {
+    sample = sample();
+  }
 
-    if (_.isArray(sample)) {
-      sample = _.sample(sample);
-    }
+  else if (_.isArray(sample)) {
+    sample = _.sample(sample);
   }
 
   // build a generic sample

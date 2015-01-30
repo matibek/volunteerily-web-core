@@ -388,14 +388,8 @@ ViewModelBase.prototype = _.create(Object.prototype, {
         return;
       }
 
-      if (_.has(value, 'sample')) {
-        result[key] = value.sample;
-      }
-
-      else {
-        result[key] = sample.getSample(key, value.type);
-      }
-
+      result[key] = sample.getSample(key, value);
+      
     });
   },
 
