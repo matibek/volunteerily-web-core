@@ -43,40 +43,59 @@ function initFields(info) {
     fields: {},
   };
 
-  function process(field, key) {
+  function process(prefix) {
 
-    if (_.has(field, 'type')) {
+    prefix = prefix ? prefix + '.' : '';
 
-      // localized type
-      if (field.type === types.localized) {
-        result.localized.push({
-          key: key,
-          value: 1,
-        });
+    return function(field, key) {
+
+      // first layer is type
+      if (_.has(field, 'type')) {
+
+        // special case for obj, we loop as an obj
+        if (!types.isType(field.type) && _.isPlainObject(field.type)) {
+          _.forIn(field.type, process(key));
+          return;
+        }
+
+        process()(field.type, key);
+        return;
       }
 
-      // array type
-      else if (_.isArray(field.type)) {
-
-        result.fields[key] = { $slice: -10, }; // latest
-
-        // add count helper
-        result.info.fields['_' + key + 'Count'] = { type: types.number, };
-        result.fields['_' + key + 'Count'] = 1; // return by default
+      // localized type
+      if (field === types.localized) {
+        result.localized.push({
+          key: prefix + key,
+          value: 1,
+        });
 
         return;
       }
 
-      else {
-        result.fields[key] = 1;
-      }
-    }
+      // array type
+      if (_.isArray(field)) {
 
-    _.forIn(field, process);
+        result.fields[prefix + key] = { $slice: -10, }; // latest
+
+        // add count helper
+        result.info.fields[prefix + '_' + key + 'Count'] = { type: types.number, };
+        result.fields[prefix + '_' + key + 'Count'] = 1; // return by default
+
+        return;
+      }
+
+      // subobject
+      if (!types.isType(field) && _.isPlainObject(field)) {
+        _.forIn(field, process(key));
+        return;
+      }
+
+      // return object
+      result.fields[prefix + key] = 1;
+    }
   }
 
-  _.forIn(info.fields, process);
-
+  _.forIn(info.fields, process());
   return result;
 }
 

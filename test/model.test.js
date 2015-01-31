@@ -300,6 +300,44 @@ describe('Core: model', function() {
 
   });
 
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  it.skip('should build an array with the count helper for subobj', function() {
+    // prepare
+    var info = {
+      name: 'Test45',
+      db: {
+        collection: 'tests',
+      },
+      fields: {
+        sub: {
+          type: {
+            test: [ model.types.string ],
+          },
+        },
+      },
+    };
+
+    var viewModel = model
+      .constructModel(info);
+
+    // run
+    var result = new viewModel.ViewModel({
+      data: { sub: { test: ['one', 'two'], }, },
+      transform: true,
+      default: true,
+    });
+
+    // result
+    expect(result.sub).to.have.property('test').with.length(2);
+    expect(result.sub.test[0]).to.equal('one');
+    expect(result.sub.test[1]).to.equal('two');
+
+    // count helper
+    expect(viewModel.info.fields).to.have.property('sub._testCount');
+    expect(result).to.have.property('sub._testCount', 2);
+  });
+
   //############################################################################
   //############################################################################
   describe('schema', function() {
@@ -551,7 +589,6 @@ describe('Core: model', function() {
 
             data: {
               localized: {
-                default: 'default',
                 en: 'english',
                 ko: 'korean',
                 cn: 'chinese',
@@ -568,6 +605,116 @@ describe('Core: model', function() {
       // result
         .then(function(result) {
           expect(result).to.have.property('localized', 'korean');
+        })
+
+      // clean
+        .fin(done)
+        .done();
+
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should return localized fields on subobject', function(done) {
+
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'fixture5',
+
+            db: {
+              collection: 'fixture',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              sub: {
+                type: {
+                  localized: model.types.localized,
+                }
+              },
+            },
+
+            data: {
+              sub: {
+                localized: {
+                  en: 'english',
+                  ko: 'korean',
+                  cn: 'chinese',
+                },
+              },
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.findById(db.data._id, { localize: 'ko', });
+        })
+
+      // result
+        .then(function(result) {
+          expect(result.sub).to.have.property('localized', 'korean');
+        })
+
+      // clean
+        .fin(done)
+        .done();
+
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should return default localized fields on subobject', function(done) {
+
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'fixture6',
+
+            db: {
+              collection: 'fixture',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              sub: {
+                type: {
+                  localized: model.types.localized,
+                }
+              },
+            },
+
+            data: {
+              sub: {
+                localized: {
+                  en: 'english',
+                  ko: 'korean',
+                  cn: 'chinese',
+                },
+              },
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.findById(db.data._id);
+        })
+
+      // result
+        .then(function(result) {
+          expect(result.sub).to.have.property('localized', 'english');
         })
 
       // clean
@@ -787,6 +934,54 @@ describe('Core: model', function() {
   //############################################################################
   //############################################################################
   describe('DB', function() {
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should return subobj', function(done) {
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'dbFind',
+
+            db: {
+              collection: 'tests',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              sub: {
+                type: {
+                  test: model.types.string,
+                },
+              },
+            },
+
+            data: {
+              sub: { test: 'test', },
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.findById(db.data._id);
+        })
+
+      // result
+        .then(function(result) {
+          expect(result).to.have.property('sub');
+          expect(result.sub).to.have.property('test', 'test');
+        })
+
+      // clean
+        .fin(done)
+        .done();
+    });
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
