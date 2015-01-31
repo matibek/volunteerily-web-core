@@ -562,12 +562,67 @@ describe('Core: model', function() {
 
       // run
         .then(function(db) {
-          return db.viewModel.findById(db.data._id, { lang: 'ko', });
+          return db.viewModel.findById(db.data._id, { localize: 'ko', });
         })
 
       // result
         .then(function(result) {
           expect(result).to.have.property('localized', 'korean');
+        })
+
+      // clean
+        .fin(done)
+        .done();
+
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should return all localized', function(done) {
+
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'fixture3',
+
+            db: {
+              collection: 'fixture',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              localized: {
+                type: model.types.localized,
+              },
+            },
+
+            data: {
+              localized: {
+                en: 'english',
+                ko: 'korean',
+                cn: 'chinese',
+              },
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.findById(db.data._id, { localize: false, });
+        })
+
+      // result
+        .then(function(result) {
+          expect(result).to.have.property('localized').and.eql({
+            en: 'english',
+            ko: 'korean',
+            cn: 'chinese',
+          });
         })
 
       // clean

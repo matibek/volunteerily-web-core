@@ -282,7 +282,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
    */
   findById: function(id, options) {
 
-    options = options || {};
+    options = _.merge({ localize: defaultLang, }, options);
 
     assert(id, 'Expected an id to be passed');
     assert(
@@ -307,7 +307,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
         }
 
         // convert
-        return new this.__constructor({ data: doc, localize: options.lang || true, });
+        return new this.__constructor({ data: doc, localize: options.localize, });
       }.bind(this));
   },
 
@@ -317,9 +317,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
    */
   find: function(options) {
 
-    if (!options) {
-      options = {};
-    }
+    options = _.merge({ localize: defaultLang, }, options);
 
     // get the mongoose model def
     var dbModel = this.getDbModel();
@@ -352,7 +350,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
         }
 
         return _.map(docs, function(doc) {
-          return new this.__constructor({ data: doc, localize: options.lang || true, });
+          return new this.__constructor({ data: doc, localize: options.localize, });
         }, this);
       }.bind(this));
   },
@@ -511,18 +509,23 @@ ViewModelBase.prototype = _.create(Object.prototype, {
       return options.fields;
     }
 
+    // no localized fields
     if (this.__fieldsLocalized.length === 0) {
       return this.__fields;
     }
 
     // localized fields
     var lang = defaultLang;
-    if (_.has(options, 'lang')) {
-      lang = options.lang;
+    if (_.has(options, 'localize')) {
+      lang = options.localize;
     }
 
     return _.reduce(this.__fieldsLocalized, function(fields, field) {
-      fields[field.key + '.' + lang] = field.value;
+      var langKey = (options.localize === false) // don't localize
+        ? ''
+        : '.' + lang;
+
+      fields[field.key + langKey] = field.value;
       return fields;
     }, this.__fields);
   },
