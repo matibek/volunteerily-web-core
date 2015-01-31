@@ -161,7 +161,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
     assert(this.__info.db.write, this.__name + ' is not writable');
 
     // get the mongoose model def
-    var DbModel = this.getDbModel();
+    var dbModel = this.getDbModel();
 
     // call db
     var fields = _.omit(this._cleanObject(), '_id');
@@ -172,7 +172,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
 
     //logger.debug('Create object', fields);
 
-    return promise.nfcall(DbModel.create.bind(DbModel), fields)
+    return promise.nfcall(dbModel.create.bind(dbModel), fields)
       .then(function(doc) {
         // not found
         if (!doc) {
@@ -215,11 +215,11 @@ ViewModelBase.prototype = _.create(Object.prototype, {
   _update: function(find, update) {
 
     // get the mongoose model def
-    var DbModel = this.getDbModel();
+    var dbModel = this.getDbModel();
 
     // call db
     return promise.nfcall(
-        DbModel.findOneAndUpdate.bind(DbModel),
+        dbModel.findOneAndUpdate.bind(dbModel),
         find,
         update
       )
@@ -254,9 +254,9 @@ ViewModelBase.prototype = _.create(Object.prototype, {
     var update = {};
     update['status.' + status] = value;
 
-    var DbModel = this.getDbModel();
+    var dbModel = this.getDbModel();
     return promise
-      .nfcall(DbModel.findByIdAndUpdate.bind(DbModel),
+      .nfcall(dbModel.findByIdAndUpdate.bind(dbModel),
         id,
         update
       )
@@ -291,12 +291,12 @@ ViewModelBase.prototype = _.create(Object.prototype, {
     );
 
     // get the mongoose model def
-    var DbModel = this.getDbModel();
+    var dbModel = this.getDbModel();
 
     // call the db
     return promise
       .nfcall(
-        DbModel.findById.bind(DbModel),
+        dbModel.findById.bind(dbModel),
         id,
         this._select(options)
       )
@@ -322,10 +322,10 @@ ViewModelBase.prototype = _.create(Object.prototype, {
     }
 
     // get the mongoose model def
-    var DbModel = this.getDbModel();
+    var dbModel = this.getDbModel();
 
     // build query
-    var query = DbModel
+    var query = dbModel
       .find(options.conditions || {})
       .select(this._select(options));
 
@@ -372,11 +372,11 @@ ViewModelBase.prototype = _.create(Object.prototype, {
     );
 
     // get the mongoose model def
-    var DbModel = this.getDbModel();
+    var dbModel = this.getDbModel();
 
     // call the db
     return promise.nfcall(
-        DbModel.findByIdAndRemove.bind(DbModel),
+        dbModel.findByIdAndRemove.bind(dbModel),
         id
       )
       .then(function(doc) {
@@ -392,6 +392,14 @@ ViewModelBase.prototype = _.create(Object.prototype, {
 
         return result;
       }.bind(this));
+  },
+
+  /**
+   * Delete private
+   */
+  _delete: function(find) {
+    var dbModel = this.getDbModel();
+    return promise.nfcall(dbModel.remove.bind(dbModel), find);
   },
 
   /**

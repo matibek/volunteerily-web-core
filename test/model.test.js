@@ -1289,5 +1289,65 @@ describe('Core: model', function() {
         .fin(done)
         .done();
     });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should delete all', function(done) {
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'dbDelete',
+
+            db: {
+              collection: 'tests',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              test: {
+                type: model.types.string,
+              },
+            },
+          });
+        })
+
+        .then(function(db) {
+          return core.promise.all([
+            db,
+            db.viewModel.create({ test: '', }),
+            db.viewModel.create({ test: '', }),
+            db.viewModel.create({ test: '', }),
+          ]);
+        })
+
+      // run
+        .then(function(result) {
+          var db = result[0];
+
+          return core.promise.all([
+            db,
+            db.viewModel.deleteAll(),
+          ]);
+        })
+
+      // result
+        .then(function(result) {
+          var db = result[0];
+
+          return db.viewModel.find();
+        })
+        .then(function(result){
+          expect(result).to.have.length(0);
+        })
+
+      // clean
+        .fin(done)
+        .done();
+    });
   });
 });

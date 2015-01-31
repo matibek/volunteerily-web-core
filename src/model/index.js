@@ -65,6 +65,13 @@ function constructModel(info) {
     },
 
     /**
+     * Delete all
+     */
+    deleteAll: function() {
+      return ViewModel.prototype._delete({});
+    },
+
+    /**
      * Updates a model given the updated fields.
      */
     update: function(id, fields, options) {
