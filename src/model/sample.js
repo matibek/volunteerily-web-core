@@ -185,5 +185,6 @@ function getSample(name, value) {
 }
 
 module.exports = {
+  map: map,
   getSample: getSample,
 };
