@@ -38,10 +38,10 @@ Mailer.prototype = _.create(events.ObservableObject.prototype, {
   send: function(options) {
 
     if (_.has(options, 'template')) {
-      return sendTemplate(options);
+      return this.sendTemplate(options);
     }
 
-    return sendHtml(options);
+    return this.sendHtml(options);
 
   },
 
