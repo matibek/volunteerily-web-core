@@ -263,20 +263,24 @@ ViewModelBase.prototype = _.create(Object.prototype, {
   /**
    * Updates a status
    */
-  updateStatus: function updateStatus(id, status, value) {
+  updateStatus: function updateStatus(find, status, value) {
 
     assert(this.__info.db.write, this.__name + ' is not writable');
 
-    assert(id, 'Expected an id');
+    assert(find, 'Expected an id');
     assert(status, 'Expected a status');
 
     var update = {};
     update['status.' + status] = value;
 
+    if (!_.isPlainObject(find)) {
+      find = { _id: find, };
+    }
+
     var dbModel = this.getDbModel();
     return promise
-      .nfcall(dbModel.findByIdAndUpdate.bind(dbModel),
-        id,
+      .nfcall(dbModel.findOneAndUpdate.bind(dbModel),
+        find,
         update
       )
       .then(function(doc) {

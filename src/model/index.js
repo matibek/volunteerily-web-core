@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var promise = require('../promise');
+var sample = require('./sample');
 var types = require('./types');
 var util = require('../util');
 var viewModelBase = require('./base');
@@ -240,5 +241,6 @@ function constructModel(info) {
 module.exports = {
   constructModel: constructModel,
   types: types,
+  sample: sample,
   setConnection: viewModelBase.setConnection,
 };

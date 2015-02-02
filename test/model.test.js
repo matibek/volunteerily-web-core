@@ -1192,6 +1192,65 @@ describe('Core: model', function() {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
+    it('should update status on complex object', function(done) {
+      // prepare
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'dbUpdateStatus2',
+
+            db: {
+              collection: 'tests',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              id2: {
+                type: model.types.id,
+              },
+              status: {
+                type: model.types.mixed,
+              },
+            },
+
+            data: {
+              id2: '5435e47000badbaddeadbeef',
+              status: {
+                test: 'test',
+              },
+            },
+          });
+        })
+
+      // run
+        .then(function(db) {
+          return db.viewModel.updateStatus(
+            {
+              _id: db.data._id,
+              id2: db.data.id2,
+            },
+            'test2',
+            'test2'
+          );
+        })
+
+      // result
+        .then(function(result) {
+          expect(result).to.have.property('status');
+          expect(result.status).to.eql({ test: 'test', test2: 'test2', });
+        })
+
+      // clean
+        .fin(done)
+        .done();
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     it('should push update', function(done) {
       // prepare
       core.promise.create()
