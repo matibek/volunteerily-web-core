@@ -302,7 +302,7 @@ describe('Core: model', function() {
 
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
-  it.skip('should build an array with the count helper for subobj', function() {
+  it('should build an array with the count helper for subobj', function() {
     // prepare
     var info = {
       name: 'Test45',
@@ -318,8 +318,7 @@ describe('Core: model', function() {
       },
     };
 
-    var viewModel = model
-      .constructModel(info);
+    var viewModel = model.constructModel(info);
 
     // run
     var result = new viewModel.ViewModel({

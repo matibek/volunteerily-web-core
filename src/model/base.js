@@ -153,14 +153,19 @@ function ViewModelBase(options) {
       }
     }
 
-    // for arrays, push the count
-    if (opts.default &&
-      _.isArray(this.__info.fields[p].type) && !this['_' + p + 'Count']
-    ) {
-      this['_' + p + 'Count'] = (_.isArray(this[p]) ? this[p].length : 0);
+    // count helper
+    if (opts.default) {
+      if (_.isArray(this[p]) || _.isPlainObject(this[p])) {
+        _.forIn(this._handleCount(p), function(value, key) {
+          this[key] = value;
+        }.bind(this));
+      }
     }
-
   }, this);
+
+  // && _.isArray(this.__info.fields[p].type) && !this['_' + p + 'Count']) {
+  //   this['_' + p + 'Count'] = (_.isArray(this[p]) ? this[p].length : 0);
+  // }
 
   // convert format of localized items
   if (opts.localize) {
@@ -586,6 +591,32 @@ ViewModelBase.prototype = _.create(Object.prototype, {
       );
     }, this);
 
+  },
+
+  /**
+   * Helper for array and count
+   */
+  _handleCount: function(key) {
+
+    var reduceFn = function(prefix) {
+
+      prefix = prefix ? prefix + '.' : '';
+
+      return function(result, field, name) {
+
+        if (_.isArray(field)) {
+          result[prefix + '_' + name + 'Count'] = field.length;
+        }
+
+        else if (_.isPlainObject(field)) {
+          _.reduce(field, reduceFn(prefix + name), result);
+        }
+
+        return result;
+      }
+    };
+
+    return reduceFn()({}, this[key], key);
   },
 
   /**
