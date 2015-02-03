@@ -956,12 +956,20 @@ describe('Core: model', function() {
               sub: {
                 type: {
                   test: model.types.string,
+                  obj: {
+                    test: model.types.string,
+                  },
                 },
               },
             },
 
             data: {
-              sub: { test: 'test', },
+              sub: {
+                test: 'test',
+                obj: {
+                  test: 'test',
+                }
+              },
             },
           });
         })
@@ -973,8 +981,15 @@ describe('Core: model', function() {
 
       // result
         .then(function(result) {
-          expect(result).to.have.property('sub');
-          expect(result.sub).to.have.property('test', 'test');
+
+          expect(result).to.be.ok();
+
+          expect(result).to.have.property('sub')
+            .and.to.have.property('test', 'test');
+
+          expect(result.sub).to.have.property('obj')
+            .and.to.have.property('test', 'test');
+
         })
 
       // clean

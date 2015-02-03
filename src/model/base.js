@@ -86,7 +86,7 @@ function initFields(info) {
 
       // subobject
       if (!types.isType(field) && _.isPlainObject(field)) {
-        _.forIn(field, process(key));
+        _.forIn(field, process(prefix + key));
         return;
       }
 
@@ -161,6 +161,7 @@ function ViewModelBase(options) {
         }.bind(this));
       }
     }
+
   }, this);
 
   // && _.isArray(this.__info.fields[p].type) && !this['_' + p + 'Count']) {
