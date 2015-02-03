@@ -181,6 +181,18 @@ function constructModel(info) {
       );
     },
 
+    /**
+     * Raw update function
+     */
+    updateRaw: function(find, update, options) {
+      return ViewModel.prototype._update.call(
+        ViewModel.prototype,
+        find,
+        update,
+        options
+      );
+    },
+
     push: function() {
       logger.warning('Deprecated: call updatePush instead');
       return this.updatePush.apply(this, arguments);
