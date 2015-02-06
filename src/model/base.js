@@ -640,7 +640,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
 
     // save to the prototype of the object
     this.__constructor.prototype.__dbModel =
-      this.__db.connection.model(
+      this.__db.adaptor.connection.model(
         name,
         schemaObj.mongooseSchema
       );

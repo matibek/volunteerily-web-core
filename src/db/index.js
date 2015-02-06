@@ -17,7 +17,8 @@ Database.prototype = _.create(events.ObservableObject.prototype, {
     this.options = _.merge({connectionString: ''}, options);
 
     // create adaptor db
-    this.adaptor = createDbAdaptor(this.options.connectionString);
+    this.connectionString = this.options.connectionString;
+    this.adaptor = createDbAdaptor(this.connectionString);
 
     return this;
   },
@@ -34,7 +35,7 @@ Database.prototype = _.create(events.ObservableObject.prototype, {
    * Connect to the db
    */
   connect: function() {
-    return this.adaptor.connect.apply(this.adaptor, arguments);
+    return this.adaptor.connect.apply(this, arguments);
   },
 
   /**
@@ -97,8 +98,8 @@ function connectMongoDb() {
   var onceListener = function(err) {
 
     // remove initial error listener
-    this.connection.removeListener('error', onceListener);
-    this.connection.removeListener('open', onceListener);
+    this.adaptor.connection.removeListener('error', onceListener);
+    this.adaptor.connection.removeListener('open', onceListener);
 
     if (err) {
       defered.reject(err);
@@ -106,13 +107,15 @@ function connectMongoDb() {
     }
 
     // register normal events
-    this.connection
+    this.adaptor.connection
       .on('error', function(err) {
         this.emit('error', err);
       }.bind(this))
+
       .on('reconnected', function() {
         this.emit('reconnected');
       }.bind(this))
+
       .on('close', function() {
         this.emit('close');
       }.bind(this));
@@ -120,11 +123,11 @@ function connectMongoDb() {
     defered.resolve(this);
   };
 
-  this.connection
+  this.adaptor.connection
     .on('error', onceListener.bind(this))
-    .once('open', onceListener.bind(this));
+    .once('open', onceListener.bind(this))
+    .open(this.adaptor.connectionString);
 
-  this.connection.open(this.connectionString);
   return defered;
 }
 
@@ -161,36 +164,34 @@ function connectRedis() {
       )
     : 6379;
 
-  this.client = this.db.createClient(port, host, {});
-
   // initial listener
   var onceListener = function(err) {
 
     // remove error listener
-    this.client.removeAllListeners('connect');
-    this.client.removeAllListeners('error');
+    this.adaptor.client.removeAllListeners('connect');
+    this.adaptor.client.removeAllListeners('error');
 
     if (err) {
-      logger.debug()
       defered.reject(err);
       return;
     }
 
-    this.client
+    this.adaptor.client
       .on('connect', function() {
         this.emit('reconnected');
-      })
+      }.bind(this))
       .on('error', function(err) {
         this.emit('error', err);
-      })
+      }.bind(this))
       .on('end', function() {
         this.emit('close');
-      });
+      }.bind(this));
 
     defered.resolve(this);
   }
 
-  this.client
+  this.adaptor.client = this.adaptor.db.createClient(port, host, {});
+  this.adaptor.client
     .on('error', onceListener.bind(this))
     .once('connect', onceListener.bind(this));
 

@@ -37,7 +37,7 @@ var commands = {
    */
   'db-clean': function() {
     return core.promise.nfcall(
-      db.connection.db.dropDatabase.bind(db.connection.db)
+      db.adaptor.connection.db.dropDatabase.bind(db.adaptor.connection.db)
     );
   },
 };
