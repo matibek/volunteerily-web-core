@@ -39,8 +39,14 @@ function Server(options) {
    */
   this.strategies = [];
 
+  /**
+   * i18n object
+   */
+  this.i18n = null;
+
   // started instance, needed for stopping
   this._instance = null;
+
 
   this._init();
 }
@@ -248,14 +254,14 @@ Server.prototype = {
 
     // localization
     if (this.options.i18n) {
-      var i18n = require('i18n');
-      i18n.configure(this.options.i18n);
+      this.i18n = require('i18n');
+      this.i18n.configure(this.options.i18n);
 
       // export localization method
       this.app.set('view shortcut', { t: '__', locale: 'locale', })
 
       // attach __ to local and res
-      this.app.use(i18n.init);
+      this.app.use(this.i18n.init);
     }
 
     // method override
