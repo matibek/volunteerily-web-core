@@ -22,6 +22,11 @@ var api = {
     return {
 
       /**
+       * Expose the express res
+       */
+      expressRes: expressRes,
+
+      /**
        * Clears the authentication
        */
       clearCookie: function() {

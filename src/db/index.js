@@ -135,7 +135,9 @@ function connectMongoDb() {
  * Disconnect mongodb
  */
 function disconnectMongoDb() {
-  return this.connection.close();
+  return promise.nfcall(
+    this.connection.close.bind(this.connection)
+  );
 }
 
 /**
