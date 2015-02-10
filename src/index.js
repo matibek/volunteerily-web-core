@@ -1,6 +1,7 @@
 
 var assert = require('assert');
 var config = require('./config');
+var cache = require('./cache');
 var crypto = require('./crypto');
 var Db = require('./db');
 var environment = require('./environment');
@@ -36,6 +37,7 @@ global.assertClient = function(condition) {
 };
 
 module.exports = {
+  cache: cache,
   config: config,
   crypto: crypto,
   Db: Db,
