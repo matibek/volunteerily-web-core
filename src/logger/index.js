@@ -61,7 +61,7 @@ Logger.prototype = _.create(Object.prototype, {
     prettyLog(
       console.info,
       chalk.white.bgBlue.bold('Info'),
-      chalk.blue,
+      chalk.magenta,
       arguments
     );
   },
@@ -86,7 +86,7 @@ Logger.prototype = _.create(Object.prototype, {
 
     prettyLog(
       console.log,
-      chalk.gray('Debug'),
+      chalk.white.bgGreen.bold('Debug'),
       chalk.green,
       (arguments.length === 0) ? ['HERE'] : arguments
     );

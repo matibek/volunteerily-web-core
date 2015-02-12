@@ -76,9 +76,11 @@ function createDbAdaptor(connectionString) {
     var engine = require('redis');
     return {
       db: engine,
+      part: '', // Prefix to simulate different db
       connectionString: connectionString,
       connect: connectRedis,
       disconnect: disconnectRedis,
+      flush: deleteAllRedis,
       logQueries: function(flag) {
         logger.debug('LOGGING NOT SUPPORTED');
       },
@@ -158,6 +160,12 @@ function connectRedis() {
         this.connectionString.indexOf('redis://') + 8
       );
 
+  var partIndex = host.lastIndexOf('/');
+  if (partIndex > 0) {
+    this.adaptor.part = host.substring(partIndex + 1);
+    host = host.substring(0, partIndex);
+  }
+
   var port = portSpecified
     ? parseInt(
         this.connectionString.substring(
@@ -204,7 +212,11 @@ function connectRedis() {
  * Disconnect redis
  */
 function disconnectRedis() {
+  // TODO:
+}
 
+function deleteAllRedis() {
+  this.client.flushall();
 }
 
 module.exports = Database;
