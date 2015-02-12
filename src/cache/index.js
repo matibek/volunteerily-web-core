@@ -142,10 +142,23 @@ CacheBase.prototype = _.create(Object.prototype, {
   },
 
   _zrank: function(key, value) {
+    assert(this.__db, 'DB not initialized');
+
     return promise.nfcall(
       this.__db.zrank.bind(this.__db),
       this.__part + key,
       value
+    );
+  },
+
+  _zrange: function(key, index, mtu) {
+    assert(this.__db, 'DB not initialized');
+
+    return promise.nfcall(
+      this.__db.zrange.bind(this.__db),
+      this.__part + key,
+      index,
+      index + mtu - 1
     );
   },
 
@@ -181,23 +194,19 @@ CacheBase.prototype = _.create(Object.prototype, {
 
     return promise.create()
       .then(function() {
-        return promise.nfcall(
-          this.__db.zrank.bind(this.__db),
-          dbKey,
-          search
-        );
+        return this._zrank(dbKey, search);
       }.bind(this))
       .then(function(result) {
         if (result === null) {
           return [];
         }
 
-        return promise.nfcall(
-          this.__db.zrange.bind(this.__db),
+        return this._zrange(
           dbKey,
           result,
-          result + mtu - 1
+          mtu
         );
+
       }.bind(this))
       .then(function(result) {
 
