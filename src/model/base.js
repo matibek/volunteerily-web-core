@@ -738,7 +738,15 @@ function setConnection(db) {
   ViewModelBase.prototype.__db = db;
 }
 
+/**
+ * Sets the data provider (localization)
+ */
+function setDataProvider(dataProvider) {
+  CacheBase.prototype.__dataProvider = dataProvider;
+}
+
 module.exports = {
   constructModelClass: constructModelClass,
   setConnection: setConnection,
+  setDataProvider: setDataProvider,
 };

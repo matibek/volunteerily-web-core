@@ -255,4 +255,5 @@ module.exports = {
   types: types,
   sample: sample,
   setConnection: viewModelBase.setConnection,
+  setDataProvider: viewModelBase.setDataProvider,
 };
