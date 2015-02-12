@@ -556,7 +556,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
 
       fields[field.key + langKey] = field.value;
       return fields;
-    }, this.__fields);
+    }, _.clone(this.__fields));
   },
 
   /**
