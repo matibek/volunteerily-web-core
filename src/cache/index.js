@@ -213,7 +213,13 @@ CacheBase.prototype = _.create(Object.prototype, {
         return _
           .chain(result)
           .filter(function(value) {
-            return value.indexOf(separator) >= 0 && value.indexOf(search) >= 0;
+            var textEndIndex = value.indexOf(separator);
+            if (textEndIndex < 0) {
+              return false;
+            }
+
+            var text = value.substring(0, textEndIndex);
+            return text.indexOf(search) >= 0;
           })
           .map(function(value) {
             var key = value.substring(value.indexOf(separator) + 1);
@@ -309,7 +315,7 @@ function resetCache() {
             key
           );
         })
-      ]);      
+      ]);
     });
 }
 
