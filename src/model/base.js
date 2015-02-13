@@ -550,11 +550,16 @@ ViewModelBase.prototype = _.create(Object.prototype, {
     }
 
     return _.reduce(this.__fieldsLocalized, function(fields, field) {
-      var langKey = (options.localize === false) // don't localize
-        ? ''
-        : '.' + lang;
+      if (options.localize === false) { // don't localize
+        fields[field.key] = field.value;
+        return fields;
+      }
 
-      fields[field.key + langKey] = field.value;
+      fields[field.key + '.' + lang] = field.value;
+      if (lang !== defaultLang) {
+        fields[field.key + '.' + defaultLang] = field.value;
+      }
+
       return fields;
     }, _.clone(this.__fields));
   },
