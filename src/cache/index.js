@@ -290,6 +290,30 @@ function setConnection(db) {
 }
 
 /**
+ * Reset the cache
+ */
+function resetCache() {
+  return promise.create()
+    .then(function() {
+      return promise.nfcall(
+        CacheBase.prototype.__db.keys.bind(CacheBase.prototype.__db),
+        CacheBase.prototype.__part + '*'
+      );
+
+    })
+    .then(function(keys) {
+      return promise.all([
+        _.map(keys, function(key) {
+          return promise.nfcall(
+            CacheBase.prototype.__db.del.bind(CacheBase.prototype.__db),
+            key
+          );
+        })
+      ]);      
+    });
+}
+
+/**
  * Sets the data provider (localization)
  */
 function setDataProvider(dataProvider) {
@@ -303,4 +327,5 @@ module.exports = {
   },
   setConnection: setConnection,
   setDataProvider: setDataProvider,
+  reset: resetCache,
 };
