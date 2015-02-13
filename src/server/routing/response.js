@@ -122,7 +122,9 @@ var api = {
        * @param {String} view The path to the view
        * @param {Object} model The model to pass to the view
        */
-      render: function(view, model) {
+      render: function(view, model, options) {
+
+        options = _.merge({ xhrJSON: true, }, options);
 
         if (_.isObject(view) && !model) {
           model = view;
@@ -130,7 +132,7 @@ var api = {
         }
 
         // xhr, then just return the json
-        if (expressReq.xhr) {
+        if (expressReq.xhr && options.xhrJSON) {
           return promise.create()
             .then(function() {
               expressRes.json(model);
