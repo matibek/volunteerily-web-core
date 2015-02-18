@@ -79,6 +79,21 @@ Router.prototype = _.create(Object.prototype, {
   },
 
   /**
+   * Register options method
+   * @param {String} path The uri path to serve
+   * @param {Method} callback The controller callback serving the uri
+   * @return {undefined}
+   */
+  options: function(path, callback) {
+    this.expressRouter.options.apply(
+      this.expressRouter,
+      this._wrapCallbacks(
+        arguments
+      )
+    );
+  },
+
+  /**
    * Map logic to route parameters
    */
   param: function() {

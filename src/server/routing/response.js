@@ -111,6 +111,13 @@ var api = {
       },
 
       /**
+       * Status function
+       */
+      status: function() {
+        return expressRes.status.apply(expressRes, arguments);
+      },
+
+      /**
        * Locale
        */
       setLocale: function() {
