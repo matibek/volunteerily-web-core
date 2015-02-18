@@ -64,11 +64,12 @@ Mailer.prototype = _.create(events.ObservableObject.prototype, {
         })
       )
       .then(function(body) {
-        this.send(_.merge(options, {
+        this.sendHtml(_.merge(options, {
           html: body,
         }));
       }.bind(this))
-      .end();
+
+      .done();
   },
 
   /**
