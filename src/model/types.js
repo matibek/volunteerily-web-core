@@ -9,6 +9,9 @@ var types = {
     default: '',
     sample: '54375fb4d9a395b4510285b6',
     db: mongoose.Schema.ObjectId, // TODO: too coupled
+    new: function() {
+      return mongoose.Types.ObjectId();
+    },
   },
 
   string: {
