@@ -139,7 +139,7 @@ var api = {
         }
 
         // xhr, then just return the json
-        if (expressReq.xhr && options.xhrJSON) {
+        if (!view || (expressReq.xhr && options.xhrJSON)) {
           return promise.create()
             .then(function() {
               expressRes.json(model);

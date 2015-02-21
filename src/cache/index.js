@@ -88,7 +88,14 @@ CacheBase.prototype = _.create(Object.prototype, {
       .then(function(data) {
 
         function parse(key, child) {
-          that._initializeAutocomplete(key, child.alias, options);
+
+          if (that._type('map')) {
+            that._initializeMap(key, child.map);
+          }
+
+          if (that._type('autocomplete')) {
+            that._initializeAutocomplete(key, child.alias, options);
+          }
 
           if (_.has(child, 'children')) {
             _.forIn(child.children, function(value, child) {
@@ -104,6 +111,16 @@ CacheBase.prototype = _.create(Object.prototype, {
       .then(function() {
         return that.setLoaded();
       });
+  },
+
+  _type: function(type) {
+    return _.indexOf(this.__info.data.type, type) >= 0;
+  },
+
+  _initializeMap: function(key, map) {
+    if (!map) {
+      logger.warning(key + ' has no map information');
+    }
   },
 
   _initializeAutocomplete: function(key, alias, options) {
@@ -298,25 +315,31 @@ function setConnection(db) {
 /**
  * Reset the cache
  */
-function resetCache() {
-  return promise.create()
-    .then(function() {
-      return promise.nfcall(
-        CacheBase.prototype.__db.keys.bind(CacheBase.prototype.__db),
-        CacheBase.prototype.__part + '*'
-      );
+function resetCache(find) {
+  return function() {
 
-    })
-    .then(function(keys) {
-      return promise.all([
-        _.map(keys, function(key) {
-          return promise.nfcall(
-            CacheBase.prototype.__db.del.bind(CacheBase.prototype.__db),
-            key
-          );
-        })
-      ]);
-    });
+    find = find ? find : CacheBase.prototype.__part + '*';
+
+    return promise.create()
+      .then(function() {
+        return promise.nfcall(
+          CacheBase.prototype.__db.keys.bind(CacheBase.prototype.__db),
+          find
+        );
+
+      })
+      .then(function(keys) {
+        return promise.all([
+          _.map(keys, function(key) {
+            logger.debug(key)
+            return promise.nfcall(
+              CacheBase.prototype.__db.del.bind(CacheBase.prototype.__db),
+              key
+            );
+          })
+        ]);
+      });
+  };
 }
 
 /**
@@ -333,5 +356,6 @@ module.exports = {
   },
   setConnection: setConnection,
   setDataProvider: setDataProvider,
-  reset: resetCache,
+  reset: resetCache(),
+  resetAll: resetCache('*'),
 };
