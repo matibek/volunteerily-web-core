@@ -6,7 +6,6 @@ var promise = require('../promise');
 var defaultConfig = {
   db: {
     separator: '$',
-    configPrefix: 'config_',
   },
 };
 
@@ -41,7 +40,7 @@ CacheBase.prototype = _.create(Object.prototype, {
   isLoaded: function() {
     return promise.create()
       .then(function() {
-        return this._get(this.__info.db.configPrefix + this.__info.db.key)
+        return this._get(this._key('config'))
       }.bind(this))
       .then(function(isLoaded) {
         return !!isLoaded;
@@ -55,7 +54,7 @@ CacheBase.prototype = _.create(Object.prototype, {
     return promise.create()
       .then(function() {
         return this._set(
-          this.__info.db.configPrefix + this.__info.db.key,
+          this._key('config'),
           new Date()
         );
       }.bind(this));
@@ -117,23 +116,35 @@ CacheBase.prototype = _.create(Object.prototype, {
     return _.indexOf(this.__info.data.type, type) >= 0;
   },
 
+  /**
+   * Initialize map
+   */
   _initializeMap: function(key, map) {
     if (!map) {
       logger.warning(key + ' has no map information');
+      return;
     }
+
+    this._hset(this._key('map'), key, JSON.stringify(map));
   },
 
+  /**
+   * Initialize autocomplete
+   */
   _initializeAutocomplete: function(key, alias, options) {
     assert(this.__db, 'DB not initialized');
     assert(this.__dataProvider, 'DataProvider not initialized');
 
     // get the language value
     _.forIn(this.__dataProvider.getAllData(this.__info.db.key + '.' + key), function(value, lang) {
-      this._decompose(this.__info.db.key + this.__info.db.separator + lang, value, key, options);
+      this._decomposeAutocompleteWord(this._key('autocomplete', lang), value, key, options);
     }.bind(this));
   },
 
-  _decompose: function(key, text, value, options) {
+  /**
+   * Decompose a word for autocomplete
+   */
+  _decomposeAutocompleteWord: function(key, text, value, options) {
 
     // store as lower
     text = text.toLowerCase();
@@ -145,6 +156,27 @@ CacheBase.prototype = _.create(Object.prototype, {
 
     // end of search
     this._zadd(key, text + this.__info.db.separator + value);
+  },
+
+  _hset: function(key, field, value) {
+    assert(this.__db, 'DB not initialized');
+
+    return promise.nfcall(
+      this.__db.hset.bind(this.__db),
+      this.__part + key,
+      field,
+      value
+    );
+  },
+
+  _hget: function(key, field) {
+    assert(this.__db, 'DB not initialized');
+
+    return promise.nfcall(
+      this.__db.hget.bind(this.__db),
+      this.__part + key,
+      field
+    );
   },
 
   _zadd: function(key, value, priority) {
@@ -198,12 +230,29 @@ CacheBase.prototype = _.create(Object.prototype, {
     );
   },
 
+  _key: function(type, lang) {
+
+    if (type === 'config') {
+      return this.__info.db.key + '.config';
+    }
+
+    if (type === 'autocomplete') {
+      return this.__info.db.key + '.a' + this.__info.db.separator + lang;
+    }
+
+    if (type === 'map') {
+      return this.__info.db.key + '.m';
+    }
+
+    throw new errors.NotImplemented('Unknown type ' + type + ' for cache key');
+  },
+
   /**
    * Searches from cache
    */
-  search: function(search, lang) {
+  autocomplete: function(search, lang) {
     var separator = this.__info.db.separator;
-    var dbKey = this.__info.db.key + this.__info.db.separator + lang;
+    var dbKey = this._key('autocomplete', lang);
     var prefix = this.__info.db.key + '.';
     var mtu = 50;
     var i18n = this.__dataProvider;
@@ -248,6 +297,22 @@ CacheBase.prototype = _.create(Object.prototype, {
           .valueOf();
       }.bind(this));
 
+  },
+
+  map: function(key) {
+    return promise.create()
+      .then(function() {
+        return this._hget(this._key('map'), key);
+      }.bind(this))
+      .then(function(map) {
+
+        if (!map) {
+          logger.warning('Map not found for place', key)
+          return {};
+        }
+
+        return JSON.parse(map);
+      });
   },
 
 });
