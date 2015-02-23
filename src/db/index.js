@@ -28,7 +28,7 @@ Database.prototype = _.create(events.ObservableObject.prototype, {
    */
   logQueries: function(flag) {
     assert(typeof flag === 'boolean', 'Expected flag to be a boolean');
-    this.adaptor.logQueries.apply(this.adaptor, flag);
+    this.adaptor.logQueries.apply(this.adaptor, arguments);
   },
 
   /**
@@ -67,7 +67,7 @@ function createDbAdaptor(connectionString) {
       connect: connectMongoDb,
       disconnect: disconnectMongoDb,
       logQueries: function(flag) {
-        this.engine.set('debug', flag);
+        engine.set('debug', flag);
       },
     };
   }
