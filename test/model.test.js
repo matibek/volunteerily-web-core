@@ -37,6 +37,34 @@ describe('Core: model', function() {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
+    it('should build default value null', function() {
+      // prepare
+      var info = {
+        name: 'Test452',
+        db: { collection: 'tests', },
+        fields: {
+          test: {
+            type: {
+              one: model.types.string,
+              two: model.types.string,
+            },
+          },
+        },
+      };
+
+      var ViewModelClass = model.constructModel(info).ViewModel;
+
+      // run
+      var viewModel = new ViewModelClass({
+        data: {},
+      });
+
+      // result
+      viewModel.should.not.have.property('test');
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     it('should build a ViewModel with the right types and values', function() {
       // prepare
       var info = {
