@@ -18,7 +18,7 @@ if (!configExist && env === constants.ENVIRONMENTS.debug) {
   configExist = fs.existsSync(configPath);
 }
 
-// support no debug config -> bump to dev config
+// support no release 
 if (!configExist && env === constants.ENVIRONMENTS.release) {
   configPath = getFullPath();
   configExist = fs.existsSync(configPath);
