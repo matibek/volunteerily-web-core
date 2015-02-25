@@ -66,6 +66,13 @@ function constructModel(info) {
     },
 
     /**
+     * Deletes by a criteria
+     */
+    delete: function(find) {
+      return ViewModel.prototype._delete(find);
+    },
+
+    /**
      * Delete all
      */
     deleteAll: function() {
