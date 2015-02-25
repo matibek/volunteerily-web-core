@@ -183,4 +183,14 @@ function prettyLog(method, prepend, color, args) {
   );
 }
 
-module.exports = new Logger();
+var instance = new Logger();
+
+if (process.env.LOG_CONTEXT) {
+  _.forEach(process.env.LOG_CONTEXT.split(','), function(context) {
+    context = context.trim();
+    instance.info('Log context enabled', context);
+    instance.enableContext(context, true);
+  });
+}
+
+module.exports = instance;
