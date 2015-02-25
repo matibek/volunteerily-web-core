@@ -31,6 +31,10 @@ function PermissionStrategy(methods) {
 
     return methods.byPassPermission.apply(methods, arguments);
   };
+
+  this.toViewModel = _.isFunction(methods.toViewModel)
+    ? methods.toViewModel.bind(methods)
+    : function(model) { return model; };
 }
 
 /**

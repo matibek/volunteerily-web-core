@@ -2,6 +2,7 @@ var _ = require('lodash');
 var authenticationMiddleware = require('../middleware/authentication');
 var config = require('../../config');
 var constants = require('../../../constants');
+var permissionMiddleware = require('../middleware/permission');
 var promise = require('../../promise');
 var util = require('../../util');
 
@@ -17,6 +18,11 @@ var api = {
     // auth
     var authStrategy = _.find(server.strategies, function(s) {
       return s instanceof authenticationMiddleware.AuthenticationStrategy;
+    });
+
+    // permission
+    var permissionStrategy = _.find(server.strategies, function(s) {
+      return s instanceof permissionMiddleware.PermissionStrategy;
     });
 
     return {
@@ -157,6 +163,17 @@ var api = {
           var auth = authStrategy.getAuthentication(expressReq, expressRes);
           model.auth = authStrategy.toViewModel(auth);
         }
+
+        if (permissionStrategy) {
+          var permission = permissionStrategy.getPermission(expressReq, expressRes);
+          model.permission = permissionStrategy.toViewModel(permission);
+        }
+
+        model.hasPermission = function(check) {
+          return permissionStrategy
+            ? permissionStrategy.hasPermission(check, expressReq, expressRes)
+            : false;
+        };
 
         // render the view
         return promise
