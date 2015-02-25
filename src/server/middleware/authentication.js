@@ -17,8 +17,11 @@ function AuthenticationStrategy(methods) {
   // validate model
   assert(_.isFunction(methods.getAuthentication),
     'Expected a getAuthentication(req, res) method');
+  assert(_.isFunction(methods.isAuthenticated),
+    'Expected a isAuthenticated(req, res) method');
 
   this.getAuthentication = methods.getAuthentication.bind(methods);
+  this.isAuthenticated = methods.isAuthenticated.bind(methods);
   this.toViewModel = _.isFunction(methods.toViewModel)
     ? methods.toViewModel.bind(methods)
     : function(model) { return model; };
@@ -48,7 +51,7 @@ var api = {
 
     promise.create()
       .then(function() {
-        return authStrategy.getAuthentication(req, res);
+        return authStrategy.isAuthenticated(req, res);
       })
       .then(function(auth) {
         if (!auth) {
