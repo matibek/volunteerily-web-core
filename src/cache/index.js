@@ -373,7 +373,7 @@ function constructCacheClass(info) {
  * Sets the db connection to the model
  */
 function setConnection(db) {
-  CacheBase.prototype.__part = db.adaptor.part + '/';
+  CacheBase.prototype.__part = db.adaptor.part + ':';
   CacheBase.prototype.__db = db.adaptor.client;
 }
 

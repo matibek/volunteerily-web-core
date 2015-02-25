@@ -18,7 +18,11 @@ function PermissionStrategy(methods) {
   assert(_.isFunction(methods.getPermission),
     'Expected a getPermission(req, res) method');
 
+  assert(_.isFunction(methods.hasPermission),
+    'Expected a hasPermission(check, req, res) method');
+
   this.getPermission = methods.getPermission.bind(methods);
+  this.hasPermission = methods.hasPermission.bind(methods);
 
   this.byPassPermission = function() {
     if (!_.isFunction(methods.byPassPermission)) {
@@ -67,71 +71,77 @@ var api = {
    */
   requirePermission: function requirePermission(permissionCheck, path) {
 
-    assert(permissionStrategy, 'An auth strategy has not been specified');
+    assert(permissionStrategy, 'A permission strategy has not been specified');
 
     return function requirePermission(req, res, next) {
 
-      return promise.create()
-        .then(function() {
-          return permissionStrategy.byPassPermission(req, res, permissionCheck, path);
-        })
-        .then(function(bypass) {
+      if (!permissionStrategy.hasPermission(permissionCheck, req, res)) {
+        throw new errors.Unauthorized();
+      }
 
-          // bypassed by strategy
-          if (bypass) {
-            next();
-            return;
-          }
+      next();
 
-          // handle as a general permission
-          if (!path) {
-            return promise
-              .create(permissionStrategy.getPermission(req, res))
-              .then(function(userPermission) {
-                proceedPermissionCheck(next, userPermission, permissionCheck);
-              });
-          }
-
-          // handle as a context with custom extraction
-          if (_.isFunction(path)) {
-            return promise
-              .all([
-                permissionStrategy.getPermission(req, res),
-                path(req, res)
-              ])
-              .then(function(results) {
-                var userPermission = results[0];
-                var value = results[1];
-
-                proceedPermissionCheck(
-                  next,
-                  userPermission,
-                  permissionCheck,
-                  value
-                );
-              });
-          }
-
-          // handle as a context
-          if (typeof path === 'string') {
-
-            // support object navigation e.g. org._id
-            var value = util.object.get(req.param.bind(req), path);
-
-            return promise
-              .create(permissionStrategy.getPermission(req, res))
-              .then(function(userPermission) {
-                proceedPermissionCheck(
-                  next,
-                  userPermission,
-                  permissionCheck,
-                  value
-                );
-              });
-          }
-
-          logger.warning('Unhandled requirePermission');
-        });
+      // return promise.create()
+      //   .then(function() {
+      //     return permissionStrategy.byPassPermission(req, res, permissionCheck, path);
+      //   })
+      //   .then(function(bypass) {
+      //
+      //     // bypassed by strategy
+      //     if (bypass) {
+      //       next();
+      //       return;
+      //     }
+      //
+      //     // handle as a general permission
+      //     if (!path) {
+      //       return promise
+      //         .create(permissionStrategy.getPermission(req, res))
+      //         .then(function(userPermission) {
+      //           proceedPermissionCheck(next, userPermission, permissionCheck);
+      //         });
+      //     }
+      //
+      //     // handle as a context with custom extraction
+      //     if (_.isFunction(path)) {
+      //       return promise
+      //         .all([
+      //           permissionStrategy.getPermission(req, res),
+      //           path(req, res)
+      //         ])
+      //         .then(function(results) {
+      //           var userPermission = results[0];
+      //           var value = results[1];
+      //
+      //           proceedPermissionCheck(
+      //             next,
+      //             userPermission,
+      //             permissionCheck,
+      //             value
+      //           );
+      //         });
+      //     }
+      //
+      //     // handle as a context
+      //     if (typeof path === 'string') {
+      //
+      //       // support object navigation e.g. org._id
+      //       var value = util.object.get(req.param.bind(req), path);
+      //
+      //       return promise
+      //         .create(permissionStrategy.getPermission(req, res))
+      //         .then(function(userPermission) {
+      //           proceedPermissionCheck(
+      //             next,
+      //             userPermission,
+      //             permissionCheck,
+      //             value
+      //           );
+      //         });
+      //     }
+      //
+      //     logger.warning('Unhandled requirePermission');
+      //   });
     };
   },
 

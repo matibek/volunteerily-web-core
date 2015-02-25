@@ -148,31 +148,20 @@ function disconnectMongoDb() {
 function connectRedis() {
   var defered = promise.defer();
 
-  var portSpecified = this.connectionString.indexOf(':')
-    !== this.connectionString.lastIndexOf(':');
+  // strip redis://
+  var connectionString = this.connectionString.substring(
+      this.connectionString.indexOf('redis://') + 8);
 
-  var host = portSpecified
-    ? this.connectionString.substring(
-        this.connectionString.indexOf('redis://') + 8,
-        this.connectionString.lastIndexOf(':')
-      )
-    : this.connectionString.substring(
-        this.connectionString.indexOf('redis://') + 8
-      );
+  var host = connectionString.substring(0, connectionString.indexOf('/'));
+  var port = 6379;
 
-  var partIndex = host.lastIndexOf('/');
-  if (partIndex > 0) {
-    this.adaptor.part = host.substring(partIndex + 1);
-    host = host.substring(0, partIndex);
+  var portIndex = host.indexOf(':');
+  if (portIndex > 0) {
+    port = host.substring(portIndex + 1);
+    host = host.substring(0, portIndex);
   }
 
-  var port = portSpecified
-    ? parseInt(
-        this.connectionString.substring(
-          this.connectionString.lastIndexOf(':')
-        )
-      )
-    : 6379;
+  this.adaptor.part = connectionString.substring(connectionString.indexOf('/') + 1);
 
   // initial listener
   var onceListener = function(err) {
