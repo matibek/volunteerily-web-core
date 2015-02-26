@@ -341,6 +341,23 @@ ViewModelBase.prototype = _.create(Object.prototype, {
   },
 
   /**
+   * Find by ids
+   */
+  findByIds: function(ids, options) {
+
+    assert(ids && ids.length > 0, 'Expected list of ids');
+
+    return this.find(_.merge(
+      {
+        conditions: {
+          _id: { $in: ids, }
+        },
+      },
+      options
+    ));
+  },
+
+  /**
    * Find given conditions
    * @return {Promise} A promise to the ViewModel
    */

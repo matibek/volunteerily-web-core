@@ -43,6 +43,13 @@ function constructModel(info) {
     },
 
     /**
+     * Finds models by list of ID.
+     */
+    findByIds: function(ids, options) {
+      return ViewModel.prototype.findByIds(ids, options);
+    },
+
+    /**
      * Finds a model given criterias.
      */
     find: function(options) {
