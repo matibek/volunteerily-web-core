@@ -59,10 +59,25 @@ function constructModel(info) {
     /**
      * Creates a model given an optional id.
      */
-    create: function(fields, id) {
-      return new ViewModel({ data: fields, transform: true, default: true, })
-        .validate()
-        .create(id);
+    create: function(fields, id, options) {
+
+      options = _.merge(
+        {
+          data: fields,
+          transform: true,
+          default: true,
+          validate: true,
+        },
+        options
+      );
+
+      var result = new ViewModel(options);
+
+      if (options.validate) {
+        result.validate();
+      }
+
+      return result.create(id);
     },
 
     /**
@@ -93,6 +108,8 @@ function constructModel(info) {
 
       assert(fields, 'Expected some changes');
 
+      options = _.merge({ transform: true, data: fields, }, options);
+
       // support multiple id
       var find = null;
       if (_.isPlainObject(id)) {
@@ -103,7 +120,7 @@ function constructModel(info) {
       // put the id in
       fields._id = id;
 
-      var result = new ViewModel({ data: fields, transform: true, });
+      var result = new ViewModel(options);
 
       if (options && options.validate) {
         result.validate(true); // only validate fields that are present
