@@ -77,13 +77,13 @@ var api = {
 
     assert(permissionStrategy, 'A permission strategy has not been specified');
 
-    return function requirePermission(req, res, next) {
+    return function requirePermission(req, res, options) {
 
       if (!permissionStrategy.hasPermission(permissionCheck, req, res)) {
         throw new errors.Unauthorized();
       }
 
-      next();
+      options.next();
 
       // return promise.create()
       //   .then(function() {
