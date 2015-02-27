@@ -138,6 +138,10 @@ Router.prototype = _.create(Object.prototype, {
   _handleRoute: function (callback) {
     var server = this.server;
 
+    if (_.isPlainObject(callback) && _.has(callback, 'express')) {
+      return callback.express;
+    }
+
     return function(req, res, next) {
 
       // wrap in a promise
@@ -160,7 +164,14 @@ Router.prototype = _.create(Object.prototype, {
           return callback(
             results[0],
             results[1],
-            next
+            {
+              express: {
+                req: req,
+                res: res,
+              },
+              server: server,
+              next: next,
+            }
           );
         })
 
