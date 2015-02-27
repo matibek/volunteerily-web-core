@@ -3,7 +3,7 @@ var api = {
   /**
    * Handler for app errors
    */
-  handleAppErrors: function handleAppErrors(err, req, res) {
+  handleAppErrors: function handleAppErrors(err, req, res, next) {
 
     // wrap in a ServerError if needed
     if (!(err instanceof errors.ServerError)) {
