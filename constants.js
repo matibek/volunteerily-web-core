@@ -3,9 +3,9 @@ var path = require('path');
 var constants = {
   ENVIRONMENTS: {
     debug: 'debug',
-    dev: 'dev',
+    dev: 'development', // standard name
     test: 'test',
-    release: 'release',
+    release: 'production', // standard name
   },
 
   SAMPLE: {
