@@ -1,3 +1,5 @@
+var environment = require('../../environment');
+
 var api = {
 
   /**
@@ -18,12 +20,11 @@ var api = {
     }
 
     // convert err to client err
-    // TODO: if on release, return generic error
     var clientErr = {
       code: err.code,
       name: err.__name,
       message: err.message,
-      err: err,
+      err: environment.isRelease ? {} : err, // only return stack on non release
     };
 
     // xhr? return a json
