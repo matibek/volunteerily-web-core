@@ -2,7 +2,10 @@ var _ = require('lodash');
 var config = require('../../config');
 var moment = require('moment');
 
-var sessionKey = config.server.session.threshold.key || 'operationLog';
+var sessionKey = (config.server && 
+  config.server.session &&
+  config.server.session.threshold &&
+  config.server.session.threshold.key) || 'operationLog';
 
 var api = {
 
