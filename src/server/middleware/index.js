@@ -14,6 +14,12 @@ function setStrategy(strategy, server) {
 
 }
 
-module.exports = {
-  setStrategy: setStrategy,
-};
+var middlewares = util.requireAll(__dirname);
+
+module.exports = _.merge(
+  {},
+  middlewares,
+  {
+    setStrategy: setStrategy,
+  }
+);

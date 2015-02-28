@@ -1,6 +1,6 @@
 var errors = require('../../errors');
-var errorHandler = require('../middleware/errorHandler');
 var express = require('express');
+var middleware = require('../middleware');
 var promise = require('../../promise');
 var request = require('./request');
 var response = require('./response');
@@ -171,6 +171,7 @@ Router.prototype = _.create(Object.prototype, {
               },
               server: server,
               next: next,
+              middleware: middleware,
             }
           );
         })
