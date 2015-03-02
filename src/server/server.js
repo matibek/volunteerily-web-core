@@ -150,14 +150,15 @@ Server.prototype = {
 
     // port
     var port = process.env.port;
+    
     if (!port) {
-      port = process.env.PORT
+      port = process.env.PORT;
     }
     if (!port) {
-      port = this.options.port,
+      port = this.options.port;
     }
     if (!port) {
-      port = 8080,
+      port = 8080;
     }
 
     this._instance = this.app.listen(
