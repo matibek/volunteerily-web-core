@@ -148,8 +148,20 @@ Server.prototype = {
 
     var defer = promise.defer();
 
+    // port
+    var port = process.env.port;
+    if (!port) {
+      port = process.env.PORT
+    }
+    if (!port) {
+      port = this.options.port,
+    }
+    if (!port) {
+      port = 8080,
+    }
+
     this._instance = this.app.listen(
-      process.env.PORT || this.options.port, // lets the port be set by Heroku
+      port,
       function() {
 
         /**
