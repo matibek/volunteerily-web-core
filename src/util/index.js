@@ -12,6 +12,9 @@ function getValue(obj, dotNotation) {
   return _.reduce(
     paths,
     function(nav, i) {
+      if (!nav) {
+        return null;
+      }
 
       // support methods
       if (_.isFunction(nav)) {

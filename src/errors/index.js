@@ -37,6 +37,12 @@ var errors = {
     message: '',
     clientCode: 404,
   },
+
+  TooManyOperations: {
+    code: 405,
+    message: 'Too many operations',
+    clientCode: 403,
+  },
 };
 
 /**

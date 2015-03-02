@@ -205,7 +205,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
         }
 
         // rebuild a new ViewModel
-        var result = new this.__constructor({ data: doc, });
+        var result = new this.__constructor({ data: doc.toObject(), });
 
         // event
         this.emit('create', result);
@@ -256,7 +256,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
         }
 
         // rebuild a new ViewModel
-        var result = new this.__constructor({ data: doc, });
+        var result = new this.__constructor({ data: doc.toObject(), });
 
         // event
         this.emit('update', result, update);
@@ -297,7 +297,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
         }
 
         // rebuild a new ViewModel
-        var result = new this.__constructor({ data: doc, });
+        var result = new this.__constructor({ data: doc.toObject(), });
 
         return result;
       }.bind(this));
@@ -336,7 +336,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
         }
 
         // convert
-        return new this.__constructor({ data: doc, localize: options.localize, });
+        return new this.__constructor({ data: doc.toObject(), localize: options.localize, });
       }.bind(this));
   },
 
@@ -396,7 +396,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
         }
 
         return _.map(docs, function(doc) {
-          return new this.__constructor({ data: doc, localize: options.localize, });
+          return new this.__constructor({ data: doc.toObject(), localize: options.localize, });
         }, this);
       }.bind(this));
   },
@@ -429,7 +429,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
           return null;
         }
 
-        var result = new this.__constructor({ data: doc, });
+        var result = new this.__constructor({ data: doc.toObject(), });
 
         // event
         this.emit('delete', result);
