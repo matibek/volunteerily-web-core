@@ -1,15 +1,24 @@
+var _ = require('lodash');
 var constants = require('../../constants');
 
-var env = process.env.NODE_ENV || constants.ENVIRONMENTS.release;
+function getEnvironment(env) {
+  return {
+    isDebug: (env === constants.ENVIRONMENTS.debug),
+    isDev: (
+      env === constants.ENVIRONMENTS.dev ||
+      env === constants.ENVIRONMENTS.debug
+    ),
+    isTest: (env === constants.ENVIRONMENTS.test),
+    isRelease: (env.indexOf(constants.ENVIRONMENTS.release) >= 0),
 
-module.exports = {
-  isDebug: (env === constants.ENVIRONMENTS.debug),
-  isDev: (
-    env === constants.ENVIRONMENTS.dev ||
-    env === constants.ENVIRONMENTS.debug
-  ),
-  isTest: (env === constants.ENVIRONMENTS.test),
-  isRelease: (env === constants.ENVIRONMENTS.release),
+    name: env,
+  };
+}
 
-  name: env,
-};
+module.exports = _.merge(
+  {},
+  getEnvironment(process.env.NODE_ENV || constants.ENVIRONMENTS.release),
+  {
+    getEnvironment: getEnvironment,
+  }
+);
