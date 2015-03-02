@@ -164,6 +164,7 @@ Router.prototype = _.create(Object.prototype, {
           return callback(
             results[0],
             results[1],
+            next,
             {
               express: {
                 req: req,
