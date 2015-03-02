@@ -2,7 +2,7 @@ var _ = require('lodash');
 var config = require('../../config');
 var moment = require('moment');
 
-var sessionKey = (config.server && 
+var sessionKey = (config.server &&
   config.server.session &&
   config.server.session.threshold &&
   config.server.session.threshold.key) || 'operationLog';
@@ -13,7 +13,7 @@ var api = {
    * Operation threshold middleware
    */
   operationThreshold: function(config) {
-    return function(req, res, options) {
+    return function(req, res, next, options) {
 
       assert(req, 'Expected req');
       assert(req.session, 'Session is required to use operationThreshold');

@@ -46,7 +46,7 @@ var api = {
   /**
    * Verifies if the user is authenticated
    */
-  requireAuthentication: function requireAuthentication(req, res, options) {
+  requireAuthentication: function requireAuthentication(req, res, next, options) {
     assert(authStrategy, 'An auth strategy has not been specified');
 
     promise.create()
