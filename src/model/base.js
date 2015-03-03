@@ -231,7 +231,17 @@ ViewModelBase.prototype = _.create(Object.prototype, {
       find = { _id: id, };
     }
 
-    return this._update(find, fields);
+    return promise.create()
+      .then(function() {
+        return this._update(find, fields);
+      })
+      .then(function(results) {
+        if (!results || results.length === 0) {
+          return null;
+        }
+
+        return results[0];
+      });
   },
 
   /**
