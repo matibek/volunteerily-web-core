@@ -233,51 +233,61 @@ ViewModelBase.prototype = _.create(Object.prototype, {
 
     return promise.create()
       .then(function() {
-        return this._update(find, fields);
-      }.bind(this))
-      .then(function(results) {
-        if (!results || results.length === 0) {
-          return null;
-        }
-
-        return results[0];
-      });
+        return this._updateOne(find, fields);
+      }.bind(this));
   },
 
   /**
    * Update private
    */
-  _update: function(find, update, options) {
+  _updateOne: function(find, update, options) {
 
     // get the mongoose model def
     var dbModel = this.getDbModel();
 
     // call db
     return promise.nfcall(
-        dbModel.update.bind(dbModel),
+        dbModel.findOneAndUpdate.bind(dbModel),
         find,
         update,
         options
       )
-      .then(function(docs) {
+      .then(function(doc) {
 
         // not found
-        if (!docs) {
-          return [];
+        if (!doc) {
+          return null;
         }
 
-        var result = _.map(docs, function(doc) {
-          return new this.__constructor({ data: doc.toObject(), localize: options.localize, });
-        }, this);
-
-        // call update multiple time
-        _.map(result, function(doc) {
-          this.emit('update', doc.toObject(), update);
+        var result = new this.__constructor({
+          data: doc.toObject(),
+          localize: options ? options.localize : null,
         });
+
+        // call event
+        if (!options || !options.emitEvent) {
+          this.emit('update', result, update);
+        }
 
         return result;
       }.bind(this));
+  },
 
+  /**
+   * Update with no return
+   */
+  _updateAsync: function(find, update, options) {
+
+    // get the mongoose model def
+    var dbModel = this.getDbModel();
+
+    // call db
+    dbModel.update(
+      find,
+      update,
+      options,
+      function() {}
+    );
   },
 
   /**

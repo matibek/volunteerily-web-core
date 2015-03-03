@@ -68,7 +68,7 @@ function prepareDb(info) {
       var viewModel = core.model.constructModel(info);
       return core.promise.all([
         viewModel,
-        viewModel.create(info.data),
+        info.data ? viewModel.create(info.data) : null,
       ]);
     })
     .then(function(results) {

@@ -158,7 +158,7 @@ function constructModel(info) {
 
       return promise.create()
         .then(function(){
-          return ViewModel.prototype._update.call(
+          return ViewModel.prototype._updateOne.call(
             ViewModel.prototype,
             find,
             {
@@ -166,13 +166,6 @@ function constructModel(info) {
               $inc: inc,
             }
           );
-        })
-        .then(function(results) {
-          if (!results || results.length === 0) {
-            return null;
-          }
-
-          return results[0];
         });
     },
 
@@ -195,7 +188,7 @@ function constructModel(info) {
 
       return promise.create()
         .then(function() {
-          return ViewModel.prototype._update.call(
+          return ViewModel.prototype._updateOne.call(
             ViewModel.prototype,
             find,
             {
@@ -203,13 +196,6 @@ function constructModel(info) {
               $inc: inc,
             }
           );
-        })
-        .then(function(results) {
-          if (!results || results.length === 0) {
-            return null;
-          }
-
-          return results[0];
         });
     },
 
@@ -236,14 +222,25 @@ function constructModel(info) {
      * Raw update function
      */
     updateRaw: function(find, update, options) {
-      return ViewModel.prototype._update.call(
+      return ViewModel.prototype._updateOne.apply(
         ViewModel.prototype,
-        find,
-        update,
-        options
+        arguments
       );
     },
 
+    /**
+     * Update async (no events will be triggered)
+     */
+    updateAsync: function(find, update, options) {
+      return ViewModel.prototype._updateAsync.apply(
+        ViewModel.prototype,
+        arguments
+      )
+    },
+
+    /**
+     * Deprecated
+     */
     push: function() {
       logger.warning('Deprecated: call updatePush instead');
       return this.updatePush.apply(this, arguments);

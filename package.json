@@ -1,13 +1,13 @@
 {
   "name": "volunteerily-web-core",
-  "version": "1.0.61",
+  "version": "1.0.62",
   "description": "Core code for DB, Server, etc",
   "main": "index.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "test": "set NODE_ENV=test&& mocha"
+    "test": "NODE_ENV=test mocha"
   },
   "repository": {
     "type": "git",

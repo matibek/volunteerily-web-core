@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var core = require('..');
 var expect = require('chai').expect;
 var model = require('../src/model');
@@ -1193,6 +1194,85 @@ describe('Core: model', function() {
       // clean
         .fin(done)
         .done();
+    });
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    it('should update multiple', function(done) {
+      // prepare
+      var db = null;
+      core.promise.create()
+        .then(function() {
+          return testUtil.db.prepareDb({
+
+            name: 'dbUpdateMultiple',
+
+            db: {
+              collection: 'tests',
+              write: true,
+            },
+
+            fields: {
+              _id: {
+                type: model.types.id,
+              },
+              test: {
+                type: model.types.string,
+              },
+            },
+
+          });
+        })
+
+      .then(function(result) {
+        db = result;
+        return core.promise.all([
+          db.viewModel.create({
+            test: 'test1',
+          }),
+          db.viewModel.create({
+            test: 'test2',
+          }),
+          db.viewModel.create({
+            test: 'test1',
+          }),
+        ]);
+      })
+
+      // run
+        .then(function(results) {
+          return db.viewModel.updateAsync(
+            {
+              test: 'test1',
+            },
+            {
+              test: 'test3',
+            },
+            {
+              multi: true,
+            }
+          );
+        })
+
+      // result
+        .then(function() {
+          _.defer(result);
+        })
+        .done();
+
+      function result() {
+        core.promise.create()
+          .then(function() {
+            return db.viewModel.find({ conditions: { test: 'test3', }, });
+          })
+          .then(function(results) {
+            expect(results).to.have.length(2);
+          })
+
+      // clean
+          .fin(done)
+          .done();
+      }
     });
 
     ////////////////////////////////////////////////////////////////////////////
