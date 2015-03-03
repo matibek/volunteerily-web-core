@@ -234,7 +234,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
     return promise.create()
       .then(function() {
         return this._update(find, fields);
-      })
+      }.bind(this))
       .then(function(results) {
         if (!results || results.length === 0) {
           return null;
