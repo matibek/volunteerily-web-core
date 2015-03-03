@@ -156,14 +156,24 @@ function constructModel(info) {
       // support multiple id
       var find = _.isPlainObject(id) ? id : { _id: id, };
 
-      return ViewModel.prototype._update.call(
-        ViewModel.prototype,
-        find,
-        {
-          $push: push,
-          $inc: inc,
-        }
-      );
+      return promise.create()
+        .then(function(){
+          return ViewModel.prototype._update.call(
+            ViewModel.prototype,
+            find,
+            {
+              $push: push,
+              $inc: inc,
+            }
+          );
+        })
+        .then(function(results) {
+          if (!results || results.length === 0) {
+            return null;
+          }
+
+          return results[0];
+        });
     },
 
     /**
@@ -183,14 +193,24 @@ function constructModel(info) {
       // support multiple id
       var find = _.isPlainObject(id) ? id : { _id: id, };
 
-      return ViewModel.prototype._update.call(
-        ViewModel.prototype,
-        find,
-        {
-          $pull: pull,
-          $inc: inc,
-        }
-      );
+      return promise.create()
+        .then(function() {
+          return ViewModel.prototype._update.call(
+            ViewModel.prototype,
+            find,
+            {
+              $pull: pull,
+              $inc: inc,
+            }
+          );
+        })
+        .then(function(results) {
+          if (!results || results.length === 0) {
+            return null;
+          }
+
+          return results[0];
+        });
     },
 
     /**
