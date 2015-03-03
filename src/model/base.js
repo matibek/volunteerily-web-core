@@ -237,29 +237,33 @@ ViewModelBase.prototype = _.create(Object.prototype, {
   /**
    * Update private
    */
-  _update: function(find, update) {
+  _update: function(find, update, options) {
 
     // get the mongoose model def
     var dbModel = this.getDbModel();
 
     // call db
     return promise.nfcall(
-        dbModel.findOneAndUpdate.bind(dbModel),
+        dbModel.update.bind(dbModel),
         find,
-        update
+        update,
+        options
       )
-      .then(function(doc) {
+      .then(function(docs) {
 
         // not found
-        if (!doc) {
-          return null;
+        if (!docs) {
+          return [];
         }
 
-        // rebuild a new ViewModel
-        var result = new this.__constructor({ data: doc.toObject(), });
+        var result = _.map(docs, function(doc) {
+          return new this.__constructor({ data: doc.toObject(), localize: options.localize, });
+        }, this);
 
-        // event
-        this.emit('update', result, update);
+        // call update multiple time
+        _.map(result, function(doc) {
+          this.emit('update', doc.toObject(), update);
+        });
 
         return result;
       }.bind(this));
