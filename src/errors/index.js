@@ -130,7 +130,7 @@ var errorDefinitions = _.transform(errors, function(result, value, name) {
 });
 
 module.exports = _.merge(errorDefinitions, {
-  
+
   /**
    * Base error
    */
@@ -140,7 +140,7 @@ module.exports = _.merge(errorDefinitions, {
    * Builds a validation error
    */
   buildValidationError: function(field, message) {
-    var result = new errors.Validation({
+    var result = new errorDefinition.Validation({
       message: message,
       result: {},
     });
