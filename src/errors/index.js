@@ -130,7 +130,28 @@ var errorDefinitions = _.transform(errors, function(result, value, name) {
 });
 
 module.exports = _.merge(errorDefinitions, {
+  
+  /**
+   * Base error
+   */
   ServerError: ServerError,
+
+  /**
+   * Builds a validation error
+   */
+  buildValidationError: function(field, message) {
+    var result = new errors.Validation({
+      message: message,
+      result: {},
+    });
+
+    result.result[field] = { custom: message, };
+    return result;
+  },
+
+  /**
+   * Whether the error is a duplicate error
+   */
   isMongoDbDuplicateError: function(err) {
     return err.name === 'MongoError' && err.code === 11000;
   },
