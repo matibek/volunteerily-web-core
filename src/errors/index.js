@@ -140,7 +140,7 @@ module.exports = _.merge(errorDefinitions, {
    * Builds a validation error
    */
   buildValidationError: function(field, message) {
-    var result = new errorDefinition.Validation({
+    var result = new errorDefinitions.Validation({
       message: message,
       result: {},
     });
