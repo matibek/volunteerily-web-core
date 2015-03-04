@@ -18,19 +18,18 @@ function createTransport(type, options) {
     return nodeMailer.createTransport(sgTransport(options));
   }
 
+  logger.info('Mailer transport:', type);
   return nodeMailer.createTransport(options);
 }
 
 var defaultOptions = {
-  type: 'console',
-  from: '',
+  transport: 'console',
+  from: 'no-reply@organization.com',
 };
 
 function Mailer(options) {
-
   this.options = _.merge({}, defaultOptions, options);
-
-  this.transporter = createTransport(this.options.type, this.options.options);
+  this.transporter = createTransport(this.options.transport, this.options.options);
 }
 
 Mailer.prototype = _.create(events.ObservableObject.prototype, {

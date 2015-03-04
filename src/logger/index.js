@@ -80,7 +80,7 @@ Logger.prototype = _.create(Object.prototype, {
   },
 
   debug: function logDebug() {
-    if (!env.isDev) {
+    if (!env.isDev && !this._context['debug']) {
       return;
     }
 
