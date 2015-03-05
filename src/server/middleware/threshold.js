@@ -13,6 +13,14 @@ var api = {
    * Operation threshold middleware
    */
   operationThreshold: function(config) {
+
+    // no config
+    if (!config) {
+      return function(req, res, next, options) {
+        next();
+      };
+    }
+
     return function(req, res, next, options) {
 
       assert(req, 'Expected req');
