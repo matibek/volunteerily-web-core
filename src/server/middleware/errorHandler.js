@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var environment = require('../../environment');
 
 var api = {
@@ -24,7 +25,7 @@ var api = {
       code: err.code,
       name: err.__name,
       message: err.message,
-      err: environment.isRelease ? {} : err, // only return stack on non release
+      err: environment.isRelease ? _.omit(err, 'stack') : err, // only return stack on non release
     };
 
     // xhr? return a json
