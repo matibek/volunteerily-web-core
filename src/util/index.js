@@ -75,6 +75,15 @@ var api = {
     return modules;
 
   },
+
+  /**
+   * Clones a model
+   */
+  cloneModel: function(obj) {
+    var result = _.clone(obj, true);
+    result._id = obj._id;
+    return result;
+  },
 };
 
 module.exports = _.merge({
