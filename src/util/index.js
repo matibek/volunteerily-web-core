@@ -73,7 +73,30 @@ var api = {
       .valueOf();
 
     return modules;
+  },
 
+  /**
+   * Lists the full path files
+   */
+  listFiles: function(fullPath) {
+
+    function walk(dir) {
+      return _.reduce(fs.readdirSync(dir), function(result, file) {
+        file = dir + '/' + file;
+        var stat = fs.statSync(file);
+
+        if (stat && stat.isDirectory()) {
+          result = _.union(result, walk(file));
+        }
+        else {
+          result.push(file.substring(fullPath.length + 1));
+        }
+
+        return result;
+      }, []);
+    };
+
+    return walk(fullPath);
   },
 
   /**
