@@ -36,6 +36,13 @@ function constructModel(info) {
     info: info,
 
     /**
+     * Find the total number of items
+     */
+    count: function() {
+      return ViewModel.prototype.count.apply(ViewModel.prototype, arguments);
+    },
+
+    /**
      * Finds a model by ID.
      */
     findById: function(id, options) {

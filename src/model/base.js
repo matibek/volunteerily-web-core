@@ -177,6 +177,17 @@ function ViewModelBase(options) {
 ViewModelBase.prototype = _.create(Object.prototype, {
 
   /**
+   * Gets the number of rows
+   */
+  count: function(find) {
+
+    // get the mongoose model def
+    var dbModel = this.getDbModel();
+
+    return promise.nfcall(dbModel.count.bind(dbModel), find);
+  },
+
+  /**
    * Saves the ViewModel to the DB
    * @param {ObjectId} id (optional) Specify an id for the new object
    * @return {Promise} A promise to the new ViewModel
