@@ -103,6 +103,11 @@ var api = {
    * Clones a model
    */
   cloneModel: function(obj) {
+
+    if (!obj) {
+      return obj;
+    }
+
     var result = _.clone(obj, true);
     result._id = obj._id;
     return result;

@@ -90,8 +90,8 @@ function constructModel(info) {
     /**
      * Deletes by a criteria
      */
-    delete: function(find) {
-      return ViewModel.prototype._delete(find);
+    delete: function() {
+      return ViewModel.prototype._delete.apply(ViewModel.prototype, arguments);
     },
 
     /**

@@ -144,6 +144,14 @@ var api = {
           view = '';
         }
 
+        // // delete
+        // if (expressReq.method.toLowerCase() === 'delete') {
+        //   return promise.create()
+        //     .then(function() {
+        //       expressRes.send('');
+        //     });
+        // }
+
         // xhr, then just return the json
         if (!view || (expressReq.xhr && options.xhrJSON)) {
           return promise.create()
