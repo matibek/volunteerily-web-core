@@ -9,24 +9,37 @@ function getFullPath(environment) {
   return path.join(process.cwd(), configPath + '.js');
 }
 
-var configPath = getFullPath(env);
-var configExist = fs.existsSync(configPath);
+function load() {
 
-// support no debug config -> bump to dev config
-if (!configExist && env === constants.ENVIRONMENTS.debug) {
-  configPath = getFullPath(constants.ENVIRONMENTS.dev);
+  // 1. config.js
+  var configPath = getFullPath();
+  var configExist = fs.existsSync(configPath);
+
+  if (configExist) {
+    return require(configPath);
+  }
+
+  // 2. config.[env].js
+  configPath = getFullPath(env);
   configExist = fs.existsSync(configPath);
-}
 
-// support no release 
-if (!configExist && env === constants.ENVIRONMENTS.release) {
-  configPath = getFullPath();
-  configExist = fs.existsSync(configPath);
-}
+  if (configExist) {
+    return require(configPath);
+  }
 
-// load config
-if (!configExist) {
+  // 3. debug -> dev
+  if (!configExist && env === constants.ENVIRONMENTS.debug) {
+    configPath = getFullPath(constants.ENVIRONMENTS.dev);
+    configExist = fs.existsSync(configPath);
+  }
+
+  if (configExist) {
+    return require(configPath);
+  }
+
+  // didn't find anything
   logger.error('Config file doesn\'t exist: ' + configPath);
+  return {};
 }
 
-module.exports = configExist ? require(configPath) : {};
+module.exports = load();
