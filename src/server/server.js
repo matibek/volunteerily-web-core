@@ -12,6 +12,7 @@ var morgan = require('morgan');
 var path = require('path');
 var promise = require('../promise');
 var Router = require('./routing/router');
+var urlUtil = require('url');
 var util = require('../util');
 
 /**
@@ -47,6 +48,8 @@ function Server(options) {
   // started instance, needed for stopping
   this._instance = null;
 
+  this.desktopUrl = null;
+  this.mobileUrl = null;
 
   this._init();
 }
@@ -150,7 +153,7 @@ Server.prototype = {
 
     // port
     var port = process.env.port;
-    
+
     if (!port) {
       port = process.env.PORT;
     }
@@ -213,13 +216,25 @@ Server.prototype = {
   */
   _init: function() {
 
+    // url
+    if (this.options.url.mobile) {
+      this.mobileUrl = urlUtil.parse(this.options.url.mobile);
+    }
+
+    if (this.options.url.desktop) {
+      this.desktopUrl = urlUtil.parse(this.options.url.desktop);
+    }
+    else {
+      this.desktopUrl = urlUtil.parse(this.options.url);
+    }
+
     // favicon
     if (this.options.favicon) {
       this.app.use(favicon(this.options.favicon));
     }
 
     // set the view engine
-    this.app.set('views', this.options.views);
+    this.app.set('views', this.options.views.root);
 
     _.forIn(this.options.viewEngines, function(value, key) {
       var engine;

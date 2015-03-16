@@ -144,20 +144,20 @@ var api = {
           view = '';
         }
 
-        // // delete
-        // if (expressReq.method.toLowerCase() === 'delete') {
-        //   return promise.create()
-        //     .then(function() {
-        //       expressRes.send('');
-        //     });
-        // }
-
         // xhr, then just return the json
         if (!view || (expressReq.xhr && options.xhrJSON)) {
           return promise.create()
             .then(function() {
               expressRes.json(model);
             });
+        }
+
+        // support for mobile
+        if (server.mobileUrl && (server.mobileUrl.hostname === expressReq.hostname)) {
+          view = server.options.views.mobile + '/' + view;
+        }
+        else {
+          view = server.options.views.desktop + '/' + view;
         }
 
         // wrap in a model for cleanliness
