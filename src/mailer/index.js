@@ -30,18 +30,29 @@ var defaultOptions = {
 function Mailer(options) {
   this.options = _.merge({}, defaultOptions, options);
   this.transporter = createTransport(this.options.transport, this.options.options);
+  this.settings = {}; // express like settings
 }
 
 Mailer.prototype = _.create(events.ObservableObject.prototype, {
 
-  send: function(options) {
+  /**
+   * Settings
+   */
+  initShortcut: function(shortcut) {
+    this.settings = {
+      'view shortcut': shortcut,
+    };
+  },
 
+  /**
+   * Sends an email
+   */
+  send: function(options) {
     if (_.has(options, 'template')) {
       return this.sendTemplate(options);
     }
 
     return this.sendHtml(options);
-
   },
 
   /**
@@ -58,6 +69,10 @@ Mailer.prototype = _.create(events.ObservableObject.prototype, {
           options.template + '.dot'
         ),
         {
+          // express config to pass in extra stuff
+          settings: this.settings,
+          _locals: options._locals,
+
           config: config.public || {},
           model: options.model || {},
         })
