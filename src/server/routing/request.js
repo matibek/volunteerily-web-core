@@ -47,6 +47,12 @@ var api = {
         }
 
         return expressReq;
+      })
+
+      // inject helper
+      .then(function(req) {        
+        req.isMobile = server.mobileUrl && (server.mobileUrl.hostname === expressReq.hostname);
+        return req;
       });
   },
 
