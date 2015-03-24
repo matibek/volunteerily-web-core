@@ -36,10 +36,15 @@ var api = {
     }
 
     // TODO: if on release, just redirect to a 500 url
+    var errorPage = 'errors/500';
+
+    if (err.clientCode === 403 || err.clientCode === 400) {
+      errorPage = 'errors/403';
+    }
 
     // redirect to an error page
     return res.render(
-      'error',
+      errorPage,
       clientErr,
       function(err, html) {
         if (err) {
@@ -50,7 +55,17 @@ var api = {
       }
     );
 
-  }
+  },
+
+  /**
+   * Handler for not found (404 error)
+   */
+   handleNotFoundError: function handleNotFoundError(req, res, next) {
+
+     var errorPage = 'errors/404';
+     // redirect to an error page
+     return res.render(errorPage);
+   }
 };
 
 module.exports = api;

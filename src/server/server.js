@@ -306,8 +306,11 @@ Server.prototype = {
    */
   _initEnd: function() {
 
-    // error handling
+    // app error handling
     this.app.use(errorHandler.handleAppErrors);
+
+    // not found error
+    this.app.use(errorHandler.handleNotFoundError);    
   },
 };
 
