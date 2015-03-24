@@ -147,7 +147,7 @@ CacheBase.prototype = _.create(Object.prototype, {
   _decomposeAutocompleteWord: function(key, text, value, options) {
 
     // store as lower
-    text = text.toLowerCase();
+    text = text.toLowerCase().replace(/ /g,'');
 
     // substrings
     for (var i=options.min; i<=text.length; i++) {
@@ -256,7 +256,7 @@ CacheBase.prototype = _.create(Object.prototype, {
     var prefix = this.__info.db.key + '.';
     var mtu = 50;
     var i18n = this.__dataProvider;
-    search = search.toLowerCase();
+    search = search.toLowerCase().replace(/ /g,'');
 
     return promise.create()
       .then(function() {
