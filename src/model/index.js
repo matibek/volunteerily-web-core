@@ -73,7 +73,7 @@ function constructModel(info) {
           data: fields,
           transform: true,
           default: true,
-          validate: true,
+          validate: 'en', //default locale for validation message
         },
         options
       );
@@ -81,7 +81,7 @@ function constructModel(info) {
       var result = new ViewModel(options);
 
       if (options.validate) {
-        result.validate();
+        result.validate(false, options.validate);
       }
 
       return result.create(id);
@@ -130,7 +130,8 @@ function constructModel(info) {
       var result = new ViewModel(options);
 
       if (options && options.validate) {
-        result.validate(true); // only validate fields that are present
+        options.validate = _.isString(options.validate) ? options.validate : 'en'; // check for locale
+        result.validate(true, options.validate); // only validate fields that are present
       }
 
       return result.update(find);

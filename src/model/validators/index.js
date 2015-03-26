@@ -122,7 +122,7 @@ var map = {
  *   reger: 'Error message 2',
  * }
  */
-function validate(validators, value) {
+function validate(validators, value, locale) {
 
   if (!validators) {
     return true;
@@ -134,7 +134,12 @@ function validate(validators, value) {
     function(result, config, key) {
 
       if (!validate2(key, config, value, that)) {
-        result[key] = config.message || key + ' failed';
+        if (locale && _.isObject(config.message)) {          
+          result[key] = config.message[locale] || key + ' failed';
+        }
+        else {
+          result[key] = config.message || key + ' failed';
+        }
       }
 
       return result;

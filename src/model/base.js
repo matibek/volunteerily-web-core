@@ -504,7 +504,7 @@ ViewModelBase.prototype = _.create(Object.prototype, {
    * @param {Bool} onlyParam Only validates the fields in param
    * @return {this} For chaining
    */
-  validate: function (onlyParam) {
+  validate: function (onlyParam, locale) {
 
     // if no definition, it's valid
     if (!this.__info.create) {
@@ -551,7 +551,8 @@ ViewModelBase.prototype = _.create(Object.prototype, {
         var results = validators.validate.call(
           this,
           def.validators,
-          def.value
+          def.value,
+          locale
         );
 
         if (_.keys(results).length > 0) {
