@@ -286,7 +286,14 @@ Server.prototype = {
       this.i18n.configure(this.options.i18n);
 
       // export localization method
-      this.app.set('view shortcut', { t: '__', locale: 'locale', })
+      this.app.set('view shortcut', {
+        t: '__',
+        locale: 'locale',
+        auth: 'auth',
+        permission: 'permission',
+        query: 'query',
+        message: 'message',
+      });
 
       // attach __ to local and res
       this.app.use(this.i18n.init);
@@ -310,7 +317,7 @@ Server.prototype = {
     this.app.use(errorHandler.handleAppErrors);
 
     // not found error
-    this.app.use(errorHandler.handleNotFoundError);    
+    this.app.use(errorHandler.handleNotFoundError);
   },
 };
 

@@ -160,21 +160,17 @@ var api = {
           view = server.options.views.desktop + '/' + view;
         }
 
-        // wrap in a model for cleanliness
-        model = {
-          model: model,
-          query: expressReq.query,
-        };
-
         // append other helper
+        expressRes.locals.query = expressReq.query;
+
         if (authStrategy) {
           var auth = authStrategy.getAuthentication(expressReq, expressRes);
-          model.auth = authStrategy.toViewModel(auth);
+          expressRes.locals.auth = authStrategy.toViewModel(auth);
         }
 
         if (permissionStrategy) {
           var permission = permissionStrategy.getPermission(expressReq, expressRes);
-          model.permission = permissionStrategy.toViewModel(permission);
+          expressRes.locals.permission = permissionStrategy.toViewModel(permission);
         }
 
         model.hasPermission = function(check) {
