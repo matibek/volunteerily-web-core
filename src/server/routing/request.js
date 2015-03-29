@@ -50,8 +50,9 @@ var api = {
       })
 
       // inject helper
-      .then(function(req) {        
+      .then(function(req) {
         req.isMobile = server.mobileUrl && (server.mobileUrl.hostname === expressReq.hostname);
+        expressRes.locals.isMobile = req.isMobile;
         return req;
       });
   },
