@@ -92,6 +92,10 @@ CacheBase.prototype = _.create(Object.prototype, {
             that._initializeMap(key, child.map);
           }
 
+          if (_.has(child, 'autocomplete') && !child.autocomplete) {
+            return;
+          }
+
           if (that._type('autocomplete')) {
             that._initializeAutocomplete(key, child.alias, options);
           }
