@@ -137,7 +137,7 @@ var api = {
        */
       render: function(view, model, options) {
 
-        options = _.merge({ xhrJSON: true, }, options);
+        options = _.merge({ xhrJSON: (expressReq.query.format !== 'html'), }, options);
 
         if (_.isObject(view) && !model) {
           model = view;
