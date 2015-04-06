@@ -124,7 +124,7 @@ function ViewModelBase(options) {
         _.has(this.__info.create, p) &&
         _.has(this.__info.create[p], 'transform')
       ) {
-        this[p] = this.__info.create[p].transform.call(this, opts.data[p]);
+        this[p] = this.__info.create[p].transform.call(this, opts.data[p], opts.data);
         return;
       }
 
