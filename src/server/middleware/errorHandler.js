@@ -1,7 +1,51 @@
 var _ = require('lodash');
 var environment = require('../../environment');
+var fs = require('fs');
+var path = require('path');
+var promise = require('../../promise');
+
+// map to the error pages
+var errorPages = {};
 
 var api = {
+
+  /**
+   * Initialize the error path
+   */
+  initializeErrorPath: function(errorPath) {
+    return promise.create()
+      .then(function() {
+        return promise.nfcall(
+          fs.readdir.bind(fs),
+          errorPath
+        );
+      })
+      .then(function(files) {
+        _.forEach(files, function(file) {
+
+          var filename = file;
+          var ext = '';
+          var extIndex = file.lastIndexOf('.');
+          if (extIndex > 0) {
+            filename = file.substring(0, extIndex);
+            ext = file.substring(extIndex + 1);
+          }
+
+          errorPages[filename] = {
+            fullpath: path.join(errorPath, file),
+            filename: file,
+            name: path.join(errorPath, filename),
+            ext: ext,
+          };
+        });
+
+        logger.debug(errorPages);
+      })
+      .fail(function(err) {
+        logger.debug(errorPath, err);
+      })
+      .done();
+  },
 
   /**
    * Handler for app errors
@@ -35,16 +79,38 @@ var api = {
         .send(clientErr);
     }
 
-    // TODO: if on release, just redirect to a 500 url
-    var errorPage = 'errors/500';
+    // error page
+    var errorPage = errorPages[err.clientCode.toString()];
 
-    if (err.clientCode === 403 || err.clientCode === 400) {
-      errorPage = 'errors/403';
+    // debug
+    if (environment.isDev && errorPages['debug']) {
+      errorPage = errorPages['debug'];
     }
 
-    // redirect to an error page
+    // no page
+    if (!errorPage) {
+
+      // no page
+      if (!errorPages['500']) {
+        return res
+          .status(err.clientCode || 500)
+          .send('No error page specified for ' + (err.clientCode || 500));
+      }
+
+      // default to 500
+      errorPage = errorPages['500'];
+    }
+
+    // redirection HTML files
+    if (errorPage && errorPage.ext === 'html') {
+      return res
+        .status(err.clientCode || 500)
+        .send(fs.readFileSync(errorPage.fullpath, 'utf8'));
+    }
+
+    // redirection viewEngine
     return res.render(
-      errorPage,
+      errorPage.name,
       clientErr,
       function(err, html) {
         if (err) {
@@ -61,9 +127,7 @@ var api = {
    * Handler for not found (404 error)
    */
    handleNotFoundError: function handleNotFoundError(req, res, next) {
-
      var errorPage = 'errors/404';
-     // redirect to an error page
      return res.render(errorPage);
    }
 };

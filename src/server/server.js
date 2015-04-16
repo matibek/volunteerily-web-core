@@ -8,7 +8,6 @@ var express = require('express');
 var favicon = require('serve-favicon');
 var methodOverride = require('method-override');
 var middleware = require('./middleware');
-var morgan = require('morgan');
 var path = require('path');
 var promise = require('../promise');
 var Router = require('./routing/router');
@@ -267,6 +266,7 @@ Server.prototype = {
       }
     }, this);
 
+    // engine optimization
     if (env.isDev) {
       //this.app.set('view cache', true);
       //engine.settings.stripComment = true;
@@ -304,7 +304,14 @@ Server.prototype = {
 
     // logging
     if (env.isDev) {
-      //app.use(morgan('combined'));
+      //app.use(require('morgan')('combined'));
+    }
+
+    // serve the error paths
+    if (this.options.views.errors) {
+      var errorPath = path.join(this.options.views.root, this.options.views.errors);
+      this.static('/errors', errorPath);
+      errorHandler.initializeErrorPath(errorPath);
     }
   },
 
