@@ -38,11 +38,9 @@ var api = {
             ext: ext,
           };
         });
-
-        logger.debug(errorPages);
       })
       .fail(function(err) {
-        logger.debug(errorPath, err);
+        logger.error(errorPath, err);
       })
       .done();
   },
@@ -102,7 +100,7 @@ var api = {
     }
 
     // redirection HTML files
-    if (errorPage && errorPage.ext === 'html') {
+    if (errorPage.ext === 'html') {
       return res
         .status(err.clientCode || 500)
         .send(fs.readFileSync(errorPage.fullpath, 'utf8'));
@@ -127,8 +125,34 @@ var api = {
    * Handler for not found (404 error)
    */
    handleNotFoundError: function handleNotFoundError(req, res, next) {
-     var errorPage = 'errors/404';
-     return res.render(errorPage);
+     var errorPage = errorPages['404'];
+
+     // no page
+     if (!errorPage) {
+       return res
+         .status(404)
+         .send('No error page specified for 404');
+     }
+
+     // redirection HTML files
+     if (errorPage.ext === 'html') {
+       return res
+         .status(404)
+         .send(fs.readFileSync(errorPage.fullpath, 'utf8'));
+     }
+
+     // redirection viewEngine
+     return res.render(
+       errorPage.name,
+       {},
+       function(err, html) {
+         if (err) {
+           res.send('Server error: ' + err.message);
+         }
+
+         res.send(html);
+       }
+     );
    }
 };
 
