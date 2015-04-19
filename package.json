@@ -1,6 +1,6 @@
 {
   "name": "volunteerily-web-core",
-  "version": "1.0.83",
+  "version": "1.0.84",
   "description": "Core code for DB, Server, etc",
   "main": "index.js",
   "directories": {

@@ -115,6 +115,10 @@ var api = {
 };
 
 module.exports = _.merge({
+
+  /**
+   * String operations
+   */
   string: {
     capitalize: function(input) {
       return input[0].toUpperCase() + input.slice(1);
@@ -124,8 +128,25 @@ module.exports = _.merge({
       return input.indexOf(find) == 0;
     }
   },
+
+  /**
+   * Object operations
+   */
   object: {
     get: getValue,
     set: setValue,
   },
+
+  /**
+   * Html operations
+   */
+
+  html: {
+    safeHtml: function(html) {
+      return String(html)
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    },
+  },
+
 }, api);
