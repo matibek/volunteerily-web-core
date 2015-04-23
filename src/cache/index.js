@@ -42,9 +42,23 @@ CacheBase.prototype = _.create(Object.prototype, {
       .then(function() {
         return this._get(this._key('config'))
       }.bind(this))
-      .then(function(isLoaded) {
-        return !!isLoaded;
-      });
+      .then(function(value) {
+
+        // not loaded
+        if (!value) {
+          return false;
+        }
+
+        var valueInt = isNaN(value) ? 1 : parseInt(value);
+
+        // old values
+        if (this.info.version && this.info.version > valueInt) {
+          return false;
+        }
+
+        // up to date
+        return true;
+      }.bind(this));
   },
 
   /**
@@ -55,7 +69,7 @@ CacheBase.prototype = _.create(Object.prototype, {
       .then(function() {
         return this._set(
           this._key('config'),
-          new Date()
+          this.info.version || 1
         );
       }.bind(this));
   },
@@ -88,8 +102,8 @@ CacheBase.prototype = _.create(Object.prototype, {
 
         function parse(key, child) {
 
-          if (that._type('map')) {
-            that._initializeMap(key, child.map);
+          if (that._type('data')) {
+            that._initializeData(key, child.data);
           }
 
           if (_.has(child, 'autocomplete') && !child.autocomplete) {
@@ -121,15 +135,15 @@ CacheBase.prototype = _.create(Object.prototype, {
   },
 
   /**
-   * Initialize map
+   * Initialize data
    */
-  _initializeMap: function(key, map) {
-    if (!map) {
-      logger.warning(key + ' has no map information');
+  _initializeData: function(key, data) {
+    if (!data) {
+      logger.warning(key + ' has no data information');
       return;
     }
 
-    this._hset(this._key('map'), key, JSON.stringify(map));
+    this._hset(this._key('data'), key, JSON.stringify(data));
   },
 
   /**
@@ -244,8 +258,8 @@ CacheBase.prototype = _.create(Object.prototype, {
       return this.__info.db.key + '.a' + this.__info.db.separator + lang;
     }
 
-    if (type === 'map') {
-      return this.__info.db.key + '.m';
+    if (type === 'data') {
+      return this.__info.db.key + '.d';
     }
 
     throw new errors.NotImplemented('Unknown type ' + type + ' for cache key');
@@ -303,19 +317,19 @@ CacheBase.prototype = _.create(Object.prototype, {
 
   },
 
-  map: function(key) {
+  data: function(key) {
     return promise.create()
       .then(function() {
-        return this._hget(this._key('map'), key);
+        return this._hget(this._key('data'), key);
       }.bind(this))
-      .then(function(map) {
+      .then(function(data) {
 
-        if (!map) {
-          logger.warning('Map not found for place', key)
+        if (!data) {
+          logger.warning('Data not found for', key)
           return {};
         }
 
-        return JSON.parse(map);
+        return JSON.parse(data);
       });
   },
 
