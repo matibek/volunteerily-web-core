@@ -278,7 +278,7 @@ Server.prototype = {
     this.app.use(bodyParser.urlencoded({ extended: true }));
 
     // cookie
-    this.app.use(cookieParser(this.options.cookieSecret));
+    this.app.use(cookieParser(this.options.cookie.secret, this.options.cookie));
 
     // localization
     if (this.options.i18n) {
