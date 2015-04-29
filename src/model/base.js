@@ -49,6 +49,12 @@ function initFields(info) {
 
     return function(field, key) {
 
+      // specified field
+      if (_.has(field, 'field')) {
+        result.fields[prefix + key] = field.field;
+        return;
+      }
+
       // first layer is type
       if (_.has(field, 'type')) {
 
