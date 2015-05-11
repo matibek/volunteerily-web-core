@@ -24,34 +24,9 @@ function PermissionStrategy(methods) {
   this.getPermission = methods.getPermission.bind(methods);
   this.hasPermission = methods.hasPermission.bind(methods);
 
-  this.byPassPermission = function() {
-    if (!_.isFunction(methods.byPassPermission)) {
-      return false;
-    }
-
-    return methods.byPassPermission.apply(methods, arguments);
-  };
-
   this.toViewModel = _.isFunction(methods.toViewModel)
     ? methods.toViewModel.bind(methods)
     : function(model) { return model; };
-}
-
-/**
- * checks the permission against a value
- */
-function proceedPermissionCheck(next, userPermission, permissionCheck, key) {
-
-  if (!userPermission) {
-    throw new errors.Unauthorized();
-  }
-
-  var code = userPermission.getPermission(key, permissionCheck.context);
-  if (!permission.hasPermission(code, permissionCheck.value)) {
-    throw new errors.Unauthorized();
-  }
-
-  next();
 }
 
 var permissionStrategy;
@@ -73,89 +48,29 @@ var api = {
   /**
    * Verifies the user's permission
    */
-  requirePermission: function requirePermission(permissionCheck, path) {
+  requirePermission: function requirePermission(permissionCheck) {
 
     assert(permissionStrategy, 'A permission strategy has not been specified');
 
     return function requirePermission(req, res, next, options) {
+      promise.create()
+        .then(function() {
+          return permissionStrategy.hasPermission(permissionCheck, req, res);
+        })
+        .then(function(result) {
+          if (!result) {
+            options.next(new errors.Unauthorized());
+            return;
+          }
 
-      if (!permissionStrategy.hasPermission(permissionCheck, req, res)) {
-        throw new errors.Unauthorized();
-      }
-
-      options.next();
-
-      // return promise.create()
-      //   .then(function() {
-      //     return permissionStrategy.byPassPermission(req, res, permissionCheck, path);
-      //   })
-      //   .then(function(bypass) {
-      //
-      //     // bypassed by strategy
-      //     if (bypass) {
-      //       next();
-      //       return;
-      //     }
-      //
-      //     // handle as a general permission
-      //     if (!path) {
-      //       return promise
-      //         .create(permissionStrategy.getPermission(req, res))
-      //         .then(function(userPermission) {
-      //           proceedPermissionCheck(next, userPermission, permissionCheck);
-      //         });
-      //     }
-      //
-      //     // handle as a context with custom extraction
-      //     if (_.isFunction(path)) {
-      //       return promise
-      //         .all([
-      //           permissionStrategy.getPermission(req, res),
-      //           path(req, res)
-      //         ])
-      //         .then(function(results) {
-      //           var userPermission = results[0];
-      //           var value = results[1];
-      //
-      //           proceedPermissionCheck(
-      //             next,
-      //             userPermission,
-      //             permissionCheck,
-      //             value
-      //           );
-      //         });
-      //     }
-      //
-      //     // handle as a context
-      //     if (typeof path === 'string') {
-      //
-      //       // support object navigation e.g. org._id
-      //       var value = util.object.get(req.param.bind(req), path);
-      //
-      //       return promise
-      //         .create(permissionStrategy.getPermission(req, res))
-      //         .then(function(userPermission) {
-      //           proceedPermissionCheck(
-      //             next,
-      //             userPermission,
-      //             permissionCheck,
-      //             value
-      //           );
-      //         });
-      //     }
-      //
-      //     logger.warning('Unhandled requirePermission');
-      //   });
+          options.next();
+        })
+        .fail(function(err) {
+          options.next(new errors.ServerError('Error while checking permission', err));
+        })
+        .done();
     };
   },
-
-  // /**
-  //  * Event hook
-  //  */
-  // on: function() {
-  //   eventEmitter.on.apply(eventEmitter, arguments);
-  // },
-
 };
 
 module.exports = _.merge(
