@@ -137,9 +137,15 @@ function connectMongoDb() {
  * Disconnect mongodb
  */
 function disconnectMongoDb() {
-  return promise.nfcall(
-    this.connection.close.bind(this.connection)
-  );
+  return promise.create()
+    .then(function() {
+      return promise.nfcall(
+        this.connection.close.bind(this.connection)
+      );
+    }.bind(this))
+    .then(function() {
+      return this;
+    }.bind(this));
 }
 
 /**
